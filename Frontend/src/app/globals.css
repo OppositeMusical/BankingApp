@@ -1,0 +1,361 @@
+@import "tailwindcss";
+
+/*
+ * Theme switching is driven by a `data-theme` attribute on <html>, set before
+ * paint by the inline script in layout.tsx. Because every token below is
+ * redefined under [data-theme="dark"], token-based utilities (bg-surface,
+ * text-ink, ...) flip automatically and `dark:` variants are rarely needed.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ---------------------------------------------------------------------------
+ * Light theme (default)
+ * Every foreground/background pairing below is verified at >= 4.5:1 for text
+ * and >= 3:1 for UI boundaries and focus indicators (WCAG 2.2 AA).
+ * ------------------------------------------------------------------------- */
+:root {
+  --bg: #fbf8f5; /* warm cream page background */
+  --surface: #ffffff; /* raised cards */
+  --surface-sunk: #f3eee9; /* wells, inset rows */
+
+  --ink: #1c1917; /* 16.5:1 on bg  */
+  --ink-muted: #57534e; /*  7.2:1 on bg  */
+  --ink-subtle: #6b6560; /*  5.4:1 on bg  */
+
+  --border: #e7e0d8; /* decorative separation */
+  --border-strong: #988c7f; /*  3.1:1 on bg — form control boundaries */
+
+  --accent: #6b4e7a; /* deep plum — 6.6:1 on bg */
+  --accent-hover: #573f63;
+  --accent-soft: #f0e8f4; /* chips, active nav, subtle fills */
+  --accent-on: #ffffff; /* text on a filled plum surface — 7.0:1 */
+
+  --positive: #2f6b4f; /* money in */
+  --negative: #a14a38; /* money out — muted terracotta, not alarm red */
+  --alert: #b3261e; /* reserved for genuine alerts only */
+
+  --positive-soft: #e6f0ea;
+  --negative-soft: #f8e9e5;
+  --alert-soft: #fbe9e7;
+
+  --shadow-sm: 0 1px 2px rgb(28 25 23 / 0.05);
+  --shadow-md: 0 4px 12px -2px rgb(28 25 23 / 0.08);
+  --shadow-lg: 0 12px 32px -8px rgb(28 25 23 / 0.14);
+
+  /* Data-mark colors, separate from the UI accent on purpose: the brand plum
+     is deliberately muted, which reads as gray when it becomes a chart fill.
+     These steps are validated (lightness band, chroma floor, CVD separation,
+     normal-vision floor, contrast) against this theme's surface. */
+  --series-1: #7a3e9e; /* spent  */
+  --series-2: #b07a2b; /* earned */
+  --chart-grid: #ece5dd;
+  --chart-track: #f0eae3;
+
+  /* Scrapbook surface, used only by Flows. Decorative — never carries text
+     contrast on its own. See docs/flow-budgets.md §9. */
+  --paper: #fdfbf7;
+  --paper-edge: #e8dfd2;
+  --tape: #e4d9c3;
+  --thread: #c3b7a6;
+  --grain: 0.025;
+}
+
+/* ---------------------------------------------------------------------------
+ * Dark theme — authored deliberately, not an inversion.
+ * ------------------------------------------------------------------------- */
+[data-theme="dark"] {
+  --bg: #17141a;
+  --surface: #201c27;
+  --surface-sunk: #131018;
+
+  --ink: #f5f1f7; /* 16.3:1 on bg */
+  --ink-muted: #b5aebc; /*  8.5:1 on bg */
+  --ink-subtle: #9a93a2; /*  6.1:1 on bg */
+
+  --border: #332c3c;
+  --border-strong: #79708a; /*  3.9:1 on bg */
+
+  --accent: #c9a6dc; /* plum lifted for dark surfaces — 8.7:1 on bg */
+  --accent-hover: #d9bde8;
+  --accent-soft: #2c2336;
+  --accent-on: #1a1121; /* dark ink on a filled plum surface — 8.7:1 */
+
+  --positive: #6fc098;
+  --negative: #e39078;
+  --alert: #f2b8b5;
+
+  --positive-soft: #1b3329;
+  --negative-soft: #38231c;
+  --alert-soft: #3d1f1d;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 12px 32px -8px rgb(0 0 0 / 0.6);
+
+  /* Re-stepped for the dark surface and re-validated as a set — not flipped. */
+  --series-1: #9c5fbe;
+  --series-2: #b8862f;
+  --chart-grid: #2c2635;
+  --chart-track: #2a2432;
+
+  /* Its own paper, not a dimmed sheet of the light one. */
+  --paper: #241f2b;
+  --paper-edge: #372f42;
+  --tape: #4a3f58;
+  --thread: #5a5166;
+  --grain: 0.04;
+}
+
+/* Expose tokens to Tailwind as utilities: bg-surface, text-ink, border-border… */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-sunk: var(--surface-sunk);
+
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-on: var(--accent-on);
+
+  --color-positive: var(--positive);
+  --color-positive-soft: var(--positive-soft);
+  --color-negative: var(--negative);
+  --color-negative-soft: var(--negative-soft);
+  --color-alert: var(--alert);
+  --color-alert-soft: var(--alert-soft);
+
+  --color-series-1: var(--series-1);
+  --color-series-2: var(--series-2);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-track: var(--chart-track);
+
+  --color-paper: var(--paper);
+  --color-paper-edge: var(--paper-edge);
+  --color-tape: var(--tape);
+  --color-thread: var(--thread);
+
+  --font-hand: var(--font-caveat), ui-rounded, cursive;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+
+  --radius-card: 14px;
+  --radius-field: 10px;
+  --radius-pill: 999px;
+
+  --shadow-card: var(--shadow-sm);
+  --shadow-raised: var(--shadow-md);
+  --shadow-float: var(--shadow-lg);
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  [data-theme="dark"] {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* One consistent, high-contrast focus indicator across every interactive
+     element. Never removed — only restyled. */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Money and any aligned figures use tabular lining numerals so columns
+     line up and digits don't jitter as values change. */
+  .tabular {
+    font-variant-numeric: tabular-nums lining-nums;
+    font-feature-settings: "tnum" 1, "lnum" 1;
+  }
+
+  ::selection {
+    background: var(--accent-soft);
+    color: var(--ink);
+  }
+}
+
+@layer utilities {
+  /* Privacy Mode: blurs balances in shared/public spaces. Applied to the
+     value itself so layout, and therefore page rhythm, never shifts. */
+  .privacy-blur {
+    filter: blur(7px);
+    user-select: none;
+    pointer-events: none;
+    transition: filter 180ms var(--ease-out);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Scrapbook primitives — used only by Flows. docs/flow-budgets.md §9.
+ *
+ * The governing rule: texture and warmth are decorative; structure and type
+ * stay disciplined. Nothing here rotates an interactive element, changes a hit
+ * target, or puts text on a texture.
+ * ------------------------------------------------------------------------- */
+@layer components {
+  /* A sheet of paper with a subtly irregular, hand-cut edge. */
+  .paper {
+    background-color: var(--paper);
+    border: 1px solid var(--paper-edge);
+    border-radius: 14px 12px 15px 13px / 13px 15px 12px 14px;
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.5),
+      var(--shadow-md);
+  }
+  [data-theme="dark"] .paper {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.04),
+      var(--shadow-md);
+  }
+
+  /* One tape strip per card. Decorative only, so it is inert and hidden from
+     assistive tech and from forced-colors. */
+  .taped::before {
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: 22px;
+    width: 76px;
+    height: 21px;
+    background: color-mix(in srgb, var(--tape) 78%, transparent);
+    border-left: 1px solid rgb(255 255 255 / 0.18);
+    border-right: 1px solid rgb(0 0 0 / 0.05);
+    transform: rotate(-4deg);
+    pointer-events: none;
+  }
+  /* Peeled corner reads as "set aside for now" — used for paused flows. */
+  .taped-peeled::before {
+    transform: rotate(-13deg) translateY(-2px);
+    opacity: 0.7;
+  }
+
+  /* React Flow, restyled onto our tokens. The library ships a developer-tool
+     look by default; these overrides make the canvas part of the scrapbook. */
+  .flow-canvas .react-flow__node {
+    /* Our node components own their own surface, so strip the defaults. */
+    background: transparent;
+    border: 0;
+    padding: 0;
+    box-shadow: none;
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    width: auto;
+  }
+  .flow-canvas .react-flow__edge-path {
+    stroke: var(--thread);
+    stroke-width: 2;
+    stroke-dasharray: 6 5;
+  }
+  .flow-canvas .react-flow__edge.selected .react-flow__edge-path,
+  .flow-canvas .react-flow__edge:hover .react-flow__edge-path {
+    stroke: var(--accent);
+  }
+  .flow-canvas .react-flow__connectionline path {
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-dasharray: 6 5;
+  }
+  .flow-canvas .react-flow__handle {
+    border-radius: 999px;
+  }
+  .flow-canvas .react-flow__controls {
+    box-shadow: var(--shadow-md);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .flow-canvas .react-flow__controls-button {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    fill: var(--ink-muted);
+  }
+  .flow-canvas .react-flow__controls-button:hover {
+    background: var(--surface-sunk);
+  }
+  .flow-canvas .react-flow__attribution {
+    background: transparent;
+    color: var(--ink-subtle);
+    font-size: 10px;
+  }
+  .flow-canvas .react-flow__node.selected > div {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Dashed connector between a source and its destinations. */
+  .thread {
+    border-left: 2px dashed var(--thread);
+  }
+  .thread-node {
+    background: var(--thread);
+    border-radius: 999px;
+  }
+}
+
+@layer utilities {
+  /* Tilt is a transform: it never moves layout or changes a hit target, and it
+     is never applied to something interactive. Capped at 1.5deg. */
+  .tilt-a {
+    transform: rotate(-1.2deg);
+  }
+  .tilt-b {
+    transform: rotate(0.9deg);
+  }
+
+  /* One low-opacity grain layer per screen, behind the cards. */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--grain);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+}
+
+/* The decoration is the first thing to go when the display can't afford it. */
+@media (forced-colors: active) {
+  .taped::before,
+  .grain::after {
+    display: none;
+  }
+  .tilt-a,
+  .tilt-b {
+    transform: none;
+  }
+  .paper {
+    border-radius: 12px;
+  }
+}
+
+/* Honor the OS-level reduced-motion setting everywhere, including any
+   animation added later. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,83 @@
+import { PageHeader } from "@/components/layout/page-header";
+import { CardControls } from "./card-controls";
+import { SessionList } from "./session-list";
+import { Explainer } from "@/components/banking/explainer";
+import { Button } from "@/components/ui/button";
+import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { cards, sessions } from "@/lib/mock/data";
+
+export const metadata = { title: "Security" };
+
+export default function SecurityPage() {
+  return (
+    <>
+      <PageHeader
+        title="Security"
+        description="Freeze a card, see every device signed in, and decide who can reach your account."
+      />
+
+      <section className="mb-6">
+        <h2 className="mb-3 font-display text-xl font-semibold text-ink">
+          Cards
+        </h2>
+        <CardControls cards={cards} />
+      </section>
+
+      <section className="mb-6">
+        <h2 className="mb-3 font-display text-xl font-semibold text-ink">
+          Where you&apos;re signed in
+        </h2>
+        <SessionList sessions={sessions} />
+      </section>
+
+      <Card className="mb-6">
+        <CardHeader>
+          <div>
+            <CardTitle>Trusted contact</CardTitle>
+            <p className="mt-1 text-sm text-ink-muted">
+              Someone we can contact if we think your account is at risk and we
+              can&apos;t reach you.
+            </p>
+          </div>
+        </CardHeader>
+        <CardBody>
+          <p className="text-sm text-ink-muted">
+            You haven&apos;t named one yet.
+          </p>
+          <Button variant="secondary" size="sm" className="mt-3">
+            Add a trusted contact
+          </Button>
+          <Explainer label="What can a trusted contact see or do?">
+            Nothing. They cannot see your balance, your transactions, or your
+            personal details, and they cannot move money or make changes. We
+            contact them only to confirm we should pause activity on your
+            account. You can remove them at any time, and they are never told
+            they were removed.
+          </Explainer>
+        </CardBody>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <div>
+            <CardTitle>Leaving safely</CardTitle>
+            <p className="mt-1 text-sm text-ink-muted">
+              If someone else has access to your money and you need that to stop.
+            </p>
+          </div>
+        </CardHeader>
+        <CardBody>
+          <p className="text-sm text-ink-muted">
+            You can open a new sole account, move your direct deposit, and remove
+            shared access without the other person being notified in advance. Our
+            support team can walk through it with you, and the conversation
+            won&apos;t appear in any shared statement.
+          </p>
+          <Button variant="secondary" size="sm" className="mt-3">
+            Start a private conversation
+          </Button>
+        </CardBody>
+      </Card>
+    </>
+  );
+}
