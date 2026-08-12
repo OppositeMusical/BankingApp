@@ -1,5 +1,9 @@
 import { apiFetch } from "../client";
-import { toAccount, toAccountFromContainer } from "../adapters/account";
+import {
+  toAccount,
+  toAccountFromContainer,
+  toHolder,
+} from "../adapters/account";
 import { toTransaction } from "../adapters/transaction";
 import { isServed } from "./registry";
 import {
@@ -120,9 +124,9 @@ export const accountsApi = {
    * The contract has no cross-account feed, so this composes the per-account
    * pages. `limit` bounds both the per-account fetch and the merged result.
    */
-  activity: async (accountIds: string[], limit = 25): Promise<Transaction[]> => {
+  activity: async (accounts: Account[], limit = 25): Promise<Transaction[]> => {
     const pages = await Promise.all(
-      accountIds.map((id) => accountsApi.transactions(id, { limit })),
+      accounts.map((account) => accountsApi.transactions(account, { limit })),
     );
     return pages
       .flatMap((page) => page.items)
@@ -130,17 +134,34 @@ export const accountsApi = {
       .slice(0, limit);
   },
 
+  /**
+   * Activity for one UI account.
+   *
+   * Takes the account rather than an id because the two are not the same on
+   * the wire: a UI account is usually a SUB-account, and the endpoint is keyed
+   * on the container with `?subAccountId=` selecting the pot. Passing the
+   * sub-account id as the path segment is a 404, which is exactly what
+   * happened the first time real sub-accounts appeared.
+   */
   transactions: (
-    id: string,
+    account: Account | string,
     query: TransactionQuery = {},
-  ): Promise<Page<Transaction>> =>
-    resolve("accounts.transactions", {
-      scopedTo: id,
+  ): Promise<Page<Transaction>> => {
+    const holder =
+      typeof account === "string"
+        ? { accountId: account, subAccountId: undefined }
+        : toHolder(account);
+
+    return resolve("accounts.transactions", {
+      scopedTo: holder.accountId,
       live: async () => {
-        const response = await apiFetch(`/accounts/${id}/transactions`, {
-          query,
-          schema: TransactionsResponse,
-        });
+        const response = await apiFetch(
+          `/accounts/${holder.accountId}/transactions`,
+          {
+            query: { ...query, subAccountId: holder.subAccountId },
+            schema: TransactionsResponse,
+          },
+        );
         return {
           items: response.transactions.map(toTransaction),
           nextCursor: response.nextCursor,
@@ -150,11 +171,14 @@ export const accountsApi = {
       fixture: () =>
         withLatency({
           items: transactionFixtures.filter(
-            (transaction) => transaction.accountId === id,
+            (transaction) =>
+              transaction.accountId ===
+              (holder.subAccountId ?? holder.accountId),
           ),
           nextCursor: null,
           hasMore: false,
         }),
       empty: () => ({ items: [], nextCursor: null, hasMore: false }),
-    }),
+    });
+  },
 };

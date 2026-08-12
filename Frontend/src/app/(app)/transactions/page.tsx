@@ -6,10 +6,7 @@ export const metadata = { title: "Activity" };
 
 export default async function TransactionsPage() {
   const accounts = await accountsApi.list();
-  const transactions = await accountsApi.activity(
-    accounts.map((account) => account.id),
-    100,
-  );
+  const transactions = await accountsApi.activity(accounts, 100);
 
   const accountNames = Object.fromEntries(
     accounts.map((account) => [account.id, account.name]),

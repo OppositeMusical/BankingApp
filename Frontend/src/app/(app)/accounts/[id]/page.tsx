@@ -21,7 +21,7 @@ export default async function AccountDetailPage({
   const account = await accountsApi.get(id);
   if (!account) notFound();
 
-  const accountTransactions = (await accountsApi.transactions(account.id))
+  const accountTransactions = (await accountsApi.transactions(account))
     .items;
 
   return (

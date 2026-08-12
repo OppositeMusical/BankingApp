@@ -20,10 +20,7 @@ export default async function DashboardPage() {
     authApi.me(),
     accountsApi.list(),
   ]);
-  const recent = await accountsApi.activity(
-    accounts.map((account) => account.id),
-    5,
-  );
+  const recent = await accountsApi.activity(accounts, 5);
 
   const depositAccounts = accounts.filter((a) => a.kind !== "credit");
   const totalBalance = sumMoney(
