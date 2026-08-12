@@ -5,7 +5,12 @@ import type {
   AccountVisibility,
 } from "@/lib/types/banking";
 import { toMoney } from "./money";
-import type { WireMember, WireMemberRole, WireSubAccount } from "../wire";
+import type {
+  WireAccount,
+  WireMember,
+  WireMemberRole,
+  WireSubAccount,
+} from "../wire";
 
 /*
  * Accounts.
@@ -87,6 +92,34 @@ export function toHolder(
     return { accountId: account.parentAccountId, subAccountId: account.id };
   }
   return { accountId: account.id };
+}
+
+/**
+ * A container account, as a UI account.
+ *
+ * Used when the backend has no sub-accounts to offer — either the endpoint is
+ * unimplemented or the user genuinely has none. Showing the container is the
+ * honest thing: the balance and the id are real, so activity and transfers
+ * work against it. The alternative was falling back to fixtures, which put
+ * invented accounts on screen in live mode and made it impossible to tell what
+ * was actually there.
+ *
+ * The name is derived from `type` because the wire has no name for a
+ * container. It reads as a placeholder, which is exactly what it is.
+ */
+export function toAccountFromContainer(account: WireAccount): Account {
+  return {
+    id: account.id,
+    // It IS the container, so there is no parent to point at.
+    parentAccountId: undefined,
+    name: account.type === "business" ? "Business account" : "Personal account",
+    kind: "checking",
+    last4: account.id.replace(/\D/g, "").slice(-4).padStart(4, "0"),
+    balance: toMoney(account.balance),
+    available: toMoney(account.available),
+    visibility: "sole",
+    sharedWith: [],
+  };
 }
 
 export function toAccount(

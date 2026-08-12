@@ -1,7 +1,9 @@
 import { apiFetch } from "../client";
-import { toAccount } from "../adapters/account";
+import { toAccount, toAccountFromContainer } from "../adapters/account";
 import { toTransaction } from "../adapters/transaction";
+import { isServed } from "./registry";
 import {
+  AccountSchema,
   BalanceSchema,
   MemberSchema,
   SubAccountSchema,
@@ -46,22 +48,39 @@ export const accountsApi = {
    * registers the route.
    */
   list: (): Promise<Account[]> =>
-    resolve("accounts.subAccounts", {
+    // Resolves on `accounts.list`, which Go DOES implement — not on
+    // `accounts.subAccounts`, which it doesn't. Keying this on sub-accounts
+    // meant one unimplemented endpoint replaced the user's real accounts with
+    // fixtures, so live mode showed invented accounts and there was no way to
+    // tell what was actually there.
+    resolve("accounts.list", {
       live: async () => {
         const { accounts } = await apiFetch("/accounts", {
-          schema: listOf("accounts", SubAccountSchema.pick({ id: true })),
+          schema: listOf("accounts", AccountSchema),
         });
 
         const perAccount = await Promise.all(
           accounts.map(async (account) => {
+            // Sub-accounts are the richer shape, but optional: unimplemented
+            // today, and a user may legitimately have none. Either way the
+            // container still describes a real account.
             const [subAccounts, members] = await Promise.all([
-              apiFetch(`/accounts/${account.id}/sub-accounts`, {
-                schema: SubAccountsResponse,
-              }),
-              apiFetch(`/accounts/${account.id}/members`, {
-                schema: MembersResponse,
-              }).catch(() => ({ members: [] })),
+              isServed("accounts.subAccounts")
+                ? apiFetch(`/accounts/${account.id}/sub-accounts`, {
+                    schema: SubAccountsResponse,
+                  }).catch(() => ({ subAccounts: [] }))
+                : Promise.resolve({ subAccounts: [] }),
+              isServed("accounts.members")
+                ? apiFetch(`/accounts/${account.id}/members`, {
+                    schema: MembersResponse,
+                  }).catch(() => ({ members: [] }))
+                : Promise.resolve({ members: [] }),
             ]);
+
+            if (subAccounts.subAccounts.length === 0) {
+              return [toAccountFromContainer(account)];
+            }
+
             return subAccounts.subAccounts.map((subAccount) =>
               toAccount(subAccount, {
                 members: members.members,
