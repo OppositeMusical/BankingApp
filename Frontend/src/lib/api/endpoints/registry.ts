@@ -28,6 +28,23 @@ export const liveOperations = [
   "transfers.internal",
   "transfers.get",
   "simulate.deposit",
+  "simulate.cardSwipe",
+
+  // Shipped with the sandbox work: the schema always supported these, the Go
+  // API now serves them.
+  "accounts.subAccounts",
+  "accounts.members",
+  "accounts.budgets",
+  "rules.list",
+  "rules.create",
+  "rules.update",
+  "rules.delete",
+  "rules.executions",
+  "cards.list",
+  "cards.update",
+  "cards.authorizations",
+  "budgets.list",
+  "budgets.upsert",
 ] as const;
 
 export type LiveOperation = (typeof liveOperations)[number];
@@ -37,24 +54,11 @@ export type LiveOperation = (typeof liveOperations)[number];
  * the gap is visible in code review rather than inferred from an absence.
  */
 export const pendingOperations = [
-  "accounts.subAccounts",
-  "accounts.members",
-  "accounts.budgets",
   "transfers.external",
   "linkedAccounts.list",
-  "rules.list",
-  "rules.create",
-  "rules.update",
-  "rules.delete",
-  "rules.executions",
-  "cards.list",
-  "cards.update",
-  "cards.authorizations",
   "brokerage.account",
   "brokerage.orders",
   "brokerage.holdings",
-  "budgets.list",
-  "budgets.upsert",
 ] as const;
 
 export type PendingOperation = (typeof pendingOperations)[number];
