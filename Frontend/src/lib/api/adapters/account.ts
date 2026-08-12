@@ -72,9 +72,32 @@ function deriveVisibility(shares: AccountShare[]): AccountVisibility {
   return shares.some((share) => share.access !== "view") ? "joint" : "viewable";
 }
 
+/**
+ * A UI account, as one side of a transfer.
+ *
+ * When the account came off the wire it is a sub-account inside a container,
+ * so both ids are sent. Fixtures predate the live backend and carry no parent;
+ * there the UI id is treated as the wire account id, which keeps the request
+ * well-formed either way.
+ */
+export function toHolder(
+  account: Pick<Account, "id" | "parentAccountId">,
+): { accountId: string; subAccountId?: string } {
+  if (account.parentAccountId) {
+    return { accountId: account.parentAccountId, subAccountId: account.id };
+  }
+  return { accountId: account.id };
+}
+
 export function toAccount(
   subAccount: WireSubAccount,
-  options: { members?: WireMember[]; currentUserId?: string } = {},
+  options: {
+    members?: WireMember[];
+    currentUserId?: string;
+    /** The container the sub-account was fetched from. The wire shape does not
+     * carry it, so the caller that knows the parent passes it down. */
+    parentAccountId?: string;
+  } = {},
 ): Account {
   const shares = (options.members ?? [])
     .filter((member) => member.userId !== options.currentUserId)
@@ -84,6 +107,7 @@ export function toAccount(
 
   return {
     id: subAccount.id,
+    parentAccountId: options.parentAccountId,
     name: subAccount.label,
     kind: inferKind(subAccount.label),
     // Not in the contract. The last four of the sub-account id is stable and

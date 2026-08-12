@@ -1,10 +1,12 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { TransferFlow } from "./transfer-flow";
-import { accounts } from "@/lib/mock/data";
+import { accountsApi } from "@/lib/api";
 
 export const metadata = { title: "Move money" };
 
-export default function TransferPage() {
+export default async function TransferPage() {
+  const accounts = await accountsApi.list();
+
   return (
     <>
       <PageHeader

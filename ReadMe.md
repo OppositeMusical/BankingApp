@@ -1,8 +1,10 @@
 # BankingApp
 
 A modern banking web application. This document is the implementation plan for the
-**frontend** (Next.js + React), designed so that a **Python/FastAPI backend** can be
-plugged in later with minimal churn.
+**frontend** (Next.js + React), designed so that a backend could be plugged in later
+with minimal churn. It was written against a planned **Python/FastAPI** backend; the
+backend that actually exists is the **Go API in the sibling `Banking-backend` repo**,
+and [`docs/api-contract.md`](docs/api-contract.md) records how this plan maps onto it.
 
 ---
 
@@ -22,9 +24,12 @@ plugged in later with minimal churn.
 - Real authentication, real money movement, PCI/SOC2 concerns
 - Database design
 
-**Status:** the UI layer is built and running. The connector layer (§5) is
-specified but not yet implemented — screens currently read from typed fixtures
-that already match the planned response shapes. See §11 for exactly what exists.
+**Status:** the UI layer is built and running, and the connector layer (§5) is
+**implemented and wired into the screens**. It runs in two modes, switched by
+`NEXT_PUBLIC_API_MODE`: `mock` (fixtures, no network — the default) and `live`
+(operations the Go backend serves go over HTTP through the BFF proxy; everything
+else still resolves to fixtures behind the same signatures). See §11 for exactly
+what exists and [`docs/api-contract.md`](docs/api-contract.md) for the mapping.
 
 ---
 
@@ -468,7 +473,22 @@ categorical pair. Both offer a table view; neither uses a second y-axis.
 
 ## 11. Implementation Status
 
-Run it with `cd Frontend && npm run dev`, then open `http://localhost:3000`.
+Run it with `cd Frontend && npm run dev`, then open `http://localhost:3000` —
+that is mock mode, self-contained. To run against the real backend:
+
+```bash
+# Terminal 1 — the Go API (see Banking-backend/README.md for DB setup)
+cd ../Banking-backend/go && go run ./cmd/api
+
+# Terminal 2 — this frontend, in live mode
+cd Frontend
+cp .env.example .env.local   # then set NEXT_PUBLIC_API_MODE=live
+npm run dev
+```
+
+Sign in at `/signin` (register works too — the Go API creates the user and
+their first account). Operations Go doesn't serve yet quietly fall back to
+fixtures; `src/lib/api/endpoints/registry.ts` is the authoritative list.
 
 ### Built
 
@@ -498,6 +518,19 @@ Run it with `cd Frontend && npm run dev`, then open `http://localhost:3000`.
   of the same state, and a flow built either way lands on the flows page
   identically.
 
+- **Connector layer (§5)** — `client.ts` (the only fetch), `endpoints/` (the
+  only URLs), Zod `wire.ts` schemas validated against `openapi.yaml`,
+  `adapters/` translating wire vocabulary into the domain types above, and the
+  BFF proxy at `app/api/[...path]` holding tokens in httpOnly cookies. Screens
+  import from `@/lib/api` and consume it from async server components; client
+  components (transfer submit, sign-in) call the same modules. On the server in
+  live mode the client goes straight to `API_INTERNAL_URL` with the token read
+  from the proxy's cookie, so server rendering and browser calls share one code
+  path.
+- **Auth** — `/signin` with sign-in and registration against the Go API via
+  the BFF token exchange; the authenticated layout checks the session and
+  redirects when there isn't one.
+
 ### Deliberate deviations from the plan above
 
 | Plan said | Built instead | Why |
@@ -506,20 +539,33 @@ Run it with `cd Frontend && npm run dev`, then open `http://localhost:3000`.
 | Recharts | Hand-built SVG/CSS charts | Full control of the validated palette and token theming, no React 19 peer risk, ~0 KB added. |
 | — | **React Flow** (`@xyflow/react`) for the Flows node canvas | The one place a library earned its weight: panning, zooming, edge routing, and connection dragging are a lot of correctness to hand-roll. Restyled onto our tokens; the accessible list view remains a peer, never a fallback. |
 | shadcn/ui | Hand-written primitives | Same Radix-free markup at this scale, without pulling in a generator. Swap in later if a dialog/menu needs real focus management. |
+| MSW for mock mode | `registry.ts` + `resolve()` fixture fallback inside each endpoint | The gap isn't "backend absent", it's "backend serves 14 of ~40 operations" — so the fallback has to be per-operation and has to keep working in live mode. MSW would mock the network; this routes around it. |
+| TanStack Query hooks | Async server components await the connector; client components call it directly | Reads render on the server, so there is no client cache to manage yet. Add Query when optimistic updates or refetching earn it. |
+| FastAPI error normalization in `client.ts` | The Go envelope: `{ error: { code, message }, requestId }` | The FastAPI backend never existed. See `docs/api-contract.md` §3. |
 
 ### Not built yet
 
-The entire connector layer (§5): `client.ts`, `endpoints/`, Zod schemas, TanStack
-Query hooks, MSW handlers, and the BFF proxy at `app/api/[...path]`. Also absent:
-auth flows, tests, and `docs/api-contract.md`. Fixtures live in
-`Frontend/src/lib/mock/data.ts` and are typed against
-`Frontend/src/lib/types/banking.ts`, which is written to the wire conventions in
-§6 — so introducing the real client is a matter of swapping the data source
-behind the same types, not reshaping the screens.
+Fixture-only domains — goals, insights (fees, trends, career pause), security
+(cards, sessions), and Flow run history — have no wire representation in
+`openapi.yaml` at all, so they read from `lib/mock` until the contract grows
+them (tracked as gaps in [`docs/api-contract.md`](docs/api-contract.md) §6).
+Operations that are in the contract but not yet served by Go resolve to the
+same fixtures through the connector; flipping one live is a one-line edit in
+`src/lib/api/endpoints/registry.ts`. Also absent: automatic refresh-token
+rotation (the proxy stores the refresh cookie but nothing calls
+`/auth/refresh` unprompted), a sign-out control in the UI (`authApi.logout`
+exists), and E2E/a11y test suites (§10) — unit tests cover the adapters,
+split arithmetic, and fixtures only.
 
 ---
 
 ## 12. Notes for the Backend Team
+
+*Written for the planned FastAPI backend. The backend that shipped is the Go
+API in `Banking-backend`; [`docs/api-contract.md`](docs/api-contract.md)
+records which of these held (camelCase, minor units, cursor pagination,
+request-ID echo) and which did not (the error shape — see its §3). Kept for
+the record:*
 
 When [`Backend/`](Backend/) is built, these frontend assumptions matter:
 

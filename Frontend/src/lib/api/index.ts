@@ -7,6 +7,7 @@
  * one-file edit.
  */
 export { accountsApi } from "./endpoints/accounts";
+export { toHolder } from "./adapters/account";
 export { authApi } from "./endpoints/auth";
 export { flowsApi } from "./endpoints/flows";
 export { healthApi } from "./endpoints/health";

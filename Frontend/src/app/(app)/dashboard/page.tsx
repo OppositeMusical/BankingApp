@@ -8,24 +8,28 @@ import { TransactionRow } from "@/components/banking/transaction-row";
 import { Explainer } from "@/components/banking/explainer";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  accounts,
-  currentPerson,
-  feeSummary,
-  goals,
-  monthlyTrend,
-  transactions,
-} from "@/lib/mock/data";
+import { accountsApi, authApi } from "@/lib/api";
+// Goals, fees, and the monthly trend have no wire representation yet
+// (docs/api-contract.md §6), so they still come from fixtures.
+import { feeSummary, goals, monthlyTrend } from "@/lib/mock/data";
 import { sumMoney } from "@/lib/format/money";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const [person, accounts] = await Promise.all([
+    authApi.me(),
+    accountsApi.list(),
+  ]);
+  const recent = await accountsApi.activity(
+    accounts.map((account) => account.id),
+    5,
+  );
+
   const depositAccounts = accounts.filter((a) => a.kind !== "credit");
   const totalBalance = sumMoney(
     depositAccounts.map((a) => a.balance),
     "USD",
   );
   const thisMonth = monthlyTrend[monthlyTrend.length - 1];
-  const recent = transactions.slice(0, 5);
   const savedThisMonth = sumMoney(
     goals.map((g) => g.monthlyContribution ?? { amount: 0, currency: "USD" }),
     "USD",
@@ -36,7 +40,7 @@ export default function DashboardPage() {
       {/* Hero: the one number the page leads with. */}
       <section className="mb-8">
         <p className="text-sm text-ink-muted">
-          Good afternoon, {currentPerson.displayName}
+          Good afternoon{person ? `, ${person.displayName}` : ""}
         </p>
         <p className="mt-2 font-display text-5xl font-semibold tracking-tight text-ink sm:text-6xl">
           <Amount value={totalBalance} splitFraction />

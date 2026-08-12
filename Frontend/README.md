@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Aster — frontend
 
-## Getting Started
+The Next.js app for BankingApp. The product plan, design system, and
+architecture live in [`../ReadMe.md`](../ReadMe.md); the mapping onto the real
+backend lives in [`../docs/api-contract.md`](../docs/api-contract.md).
 
-First, run the development server:
+## Run it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+That is **mock mode**: every screen renders from typed fixtures, no backend
+required, and any credentials on `/signin` sign you in as the demo person.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Run it against the real backend
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The backend is the Go API in the sibling
+[`Banking-backend`](../../Banking-backend/) repo.
 
-## Learn More
+```bash
+# 1. Start the backend (needs Postgres — see Banking-backend/README.md)
+cd ../../Banking-backend/go && go run ./cmd/api    # listens on :4000
 
-To learn more about Next.js, take a look at the following resources:
+# 2. Point this app at it
+cp .env.example .env.local
+# set NEXT_PUBLIC_API_MODE=live in .env.local
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Register or sign in at `/signin`. The browser only ever talks to the
+same-origin BFF proxy (`src/app/api/[...path]/route.ts`), which holds the
+tokens in httpOnly cookies and forwards to `API_INTERNAL_URL` server-side —
+no CORS, no tokens in JavaScript.
 
-## Deploy on Vercel
+Operations the backend doesn't serve yet fall back to fixtures behind the same
+signatures; `src/lib/api/endpoints/registry.ts` is the list. When the backend
+ships an endpoint, move one line there.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command | What it does |
+| --- | --- |
+| `npm run dev` | Dev server |
+| `npm run build` / `start` | Production build / serve |
+| `npm test` | Vitest (adapters, flow splitting, fixtures) |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run lint` | ESLint (incl. `jsx-a11y`) |
+| `npm run gen:api` | Regenerate `src/lib/api/generated/schema.d.ts` from `../../Banking-backend/openapi.yaml` |
+
+## Where things are
+
+```
+src/lib/api/        the connector — the only fetch, the only URLs, Zod wire
+                    schemas, adapters, and the served-operation registry
+src/app/api/        BFF proxy (auth cookie exchange lives here)
+src/lib/mock/       fixtures for mock mode and not-yet-served operations
+src/lib/types/      the domain types screens are written against
+src/lib/flows/      deposit-splitting arithmetic (pure, unit-tested)
+```

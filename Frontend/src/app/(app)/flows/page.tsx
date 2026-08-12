@@ -3,11 +3,13 @@ import { Plus } from "lucide-react";
 import { FlowsGrid } from "./flows-grid";
 import { PageHeader } from "@/components/layout/page-header";
 import { Explainer } from "@/components/banking/explainer";
-import { flows } from "@/lib/mock/flows";
+import { flowsApi } from "@/lib/api";
 
 export const metadata = { title: "Flows" };
 
-export default function FlowsPage() {
+export default async function FlowsPage() {
+  const flows = await flowsApi.list();
+
   return (
     <>
       <PageHeader

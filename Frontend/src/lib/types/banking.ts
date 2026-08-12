@@ -21,6 +21,13 @@ export type AccountVisibility = "sole" | "joint" | "viewable";
 
 export type Account = {
   id: string;
+  /**
+   * The wire container this account lives in. A UI account maps from a wire
+   * sub-account, but moving money requires naming the parent (`fromAccountId`
+   * is required on POST /transfers/internal). Absent on fixtures that predate
+   * the live backend.
+   */
+  parentAccountId?: string;
   name: string;
   kind: AccountKind;
   /** Last four digits only — the UI never handles a full number. */

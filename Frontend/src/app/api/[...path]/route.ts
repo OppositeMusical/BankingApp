@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { apiConfig } from "@/lib/api/config";
+import { apiConfig, authCookies } from "@/lib/api/config";
 
 /*
  * BFF proxy.  ReadMe.md §5.5
@@ -15,8 +15,8 @@ import { apiConfig } from "@/lib/api/config";
  * continues to the browser.
  */
 
-const ACCESS_COOKIE = "ba_access";
-const REFRESH_COOKIE = "ba_refresh";
+const ACCESS_COOKIE = authCookies.access;
+const REFRESH_COOKIE = authCookies.refresh;
 
 /** Hop-by-hop headers, plus the ones we set ourselves. */
 const STRIPPED = new Set([

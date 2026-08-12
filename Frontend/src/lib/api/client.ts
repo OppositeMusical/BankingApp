@@ -42,8 +42,31 @@ export type ApiFetchOptions<T> = {
 
 const RETRY_BASE_MS = 250;
 
+/*
+ * Server-side rendering support.
+ *
+ * In the browser the base URL is the same-origin BFF proxy, which attaches the
+ * bearer token from its httpOnly cookie. A server component has neither an
+ * origin nor automatic cookies, so on the server the client goes straight to
+ * the Go API (`apiConfig.internalUrl`) and asks a registered token source for
+ * the credential. `lib/api/server.ts` registers a source that reads the same
+ * cookie the proxy writes; it lives in a separate module because `next/headers`
+ * must never enter a client bundle.
+ */
+type AuthTokenSource = () => Promise<string | null>;
+
+let authTokenSource: AuthTokenSource | null = null;
+
+export function setAuthTokenSource(source: AuthTokenSource) {
+  authTokenSource = source;
+}
+
+const onServer = () => typeof window === "undefined";
+
 function buildUrl(path: string, query?: Record<string, QueryValue>) {
-  const base = apiConfig.baseUrl.replace(/\/$/, "");
+  const base = (
+    onServer() ? apiConfig.internalUrl : apiConfig.baseUrl
+  ).replace(/\/$/, "");
   const url = `${base}${path.startsWith("/") ? path : `/${path}`}`;
   if (!query) return url;
 
@@ -114,6 +137,11 @@ export async function apiFetch<T>(
   const url = buildUrl(path, query);
   let lastTransient: unknown;
 
+  // Resolved once per call, not per attempt — the token cannot change between
+  // retries of the same request.
+  const serverToken =
+    onServer() && authTokenSource ? await authTokenSource() : null;
+
   // Attempt 0 is the request itself; the rest are retries. Mutations get
   // `retries = 0` unless a caller opts in with an idempotency key, because
   // replaying a transfer is the one mistake this layer must never make.
@@ -138,6 +166,7 @@ export async function apiFetch<T>(
           Accept: "application/json",
           ...(body === undefined ? {} : { "Content-Type": "application/json" }),
           ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
+          ...(serverToken ? { Authorization: `Bearer ${serverToken}` } : {}),
         },
         body: body === undefined ? undefined : JSON.stringify(body),
       });

@@ -6,6 +6,7 @@ import { ArrowRight, Check, TriangleAlert } from "lucide-react";
 import { Amount } from "@/components/banking/amount";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
+import { describeError, toHolder, transfersApi } from "@/lib/api";
 import { formatMoney } from "@/lib/format/money";
 import type { Account, Money } from "@/lib/types/banking";
 
@@ -17,8 +18,9 @@ type Step = "amount" | "review" | "done";
  * irreversible, which is the difference between a confirmation and a dark
  * pattern.
  *
- * Submission is stubbed — this is where `transfersApi.create()` will be called
- * once the FastAPI backend exists.
+ * Confirming calls `transfersApi.internal()`. The idempotency key is minted
+ * when the form opens — not on submit — so a double-click, a retry, or an
+ * impatient re-confirm can only ever produce one transfer.
  */
 export function TransferFlow({ accounts }: { accounts: Account[] }) {
   const [step, setStep] = useState<Step>("amount");
@@ -26,6 +28,10 @@ export function TransferFlow({ accounts }: { accounts: Account[] }) {
   const [toId, setToId] = useState(accounts[2].id);
   const [amountInput, setAmountInput] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [idempotencyKey, setIdempotencyKey] = useState(() =>
+    crypto.randomUUID(),
+  );
+  const [submitting, setSubmitting] = useState(false);
 
   const from = accounts.find((account) => account.id === fromId)!;
   const to = accounts.find((account) => account.id === toId)!;
@@ -51,6 +57,33 @@ export function TransferFlow({ accounts }: { accounts: Account[] }) {
     }
     setError(null);
     return true;
+  };
+
+  const submit = async () => {
+    setSubmitting(true);
+    setError(null);
+    try {
+      const result = await transfersApi.internal(
+        {
+          from: toHolder(from),
+          to: toHolder(to),
+          amount,
+        },
+        idempotencyKey,
+      );
+      if (result.status === "failed") {
+        setError(
+          result.failureReason ??
+            "The transfer could not be completed. Nothing was moved.",
+        );
+        return;
+      }
+      setStep("done");
+    } catch (cause) {
+      setError(describeError(cause));
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (step === "done") {
@@ -82,6 +115,9 @@ export function TransferFlow({ accounts }: { accounts: Account[] }) {
               onClick={() => {
                 setStep("amount");
                 setAmountInput("");
+                // A fresh intent needs a fresh key, or the backend would
+                // replay the transfer that just happened.
+                setIdempotencyKey(crypto.randomUUID());
               }}
             >
               Move more money
@@ -121,11 +157,31 @@ export function TransferFlow({ accounts }: { accounts: Account[] }) {
             <Row term="Arrives">Usually within seconds</Row>
           </dl>
 
+          {error && (
+            <p
+              role="alert"
+              className="mt-4 flex items-start gap-1.5 text-sm text-alert"
+            >
+              <TriangleAlert className="mt-0.5 size-4 shrink-0" aria-hidden />
+              {error}
+            </p>
+          )}
+
           <div className="mt-6 flex flex-wrap gap-2.5">
-            <Button onClick={() => setStep("done")}>
-              Confirm and move <Amount value={amount} />
+            <Button onClick={submit} disabled={submitting}>
+              {submitting ? (
+                "Moving it now…"
+              ) : (
+                <>
+                  Confirm and move <Amount value={amount} />
+                </>
+              )}
             </Button>
-            <Button variant="ghost" onClick={() => setStep("amount")}>
+            <Button
+              variant="ghost"
+              onClick={() => setStep("amount")}
+              disabled={submitting}
+            >
               Go back and edit
             </Button>
           </div>

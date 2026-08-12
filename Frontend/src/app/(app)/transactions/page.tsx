@@ -1,10 +1,16 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { TransactionBrowser } from "./transaction-browser";
-import { accounts, transactions } from "@/lib/mock/data";
+import { accountsApi } from "@/lib/api";
 
 export const metadata = { title: "Activity" };
 
-export default function TransactionsPage() {
+export default async function TransactionsPage() {
+  const accounts = await accountsApi.list();
+  const transactions = await accountsApi.activity(
+    accounts.map((account) => account.id),
+    100,
+  );
+
   const accountNames = Object.fromEntries(
     accounts.map((account) => [account.id, account.name]),
   );

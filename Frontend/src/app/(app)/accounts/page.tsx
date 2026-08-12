@@ -2,11 +2,13 @@ import { AccountCarousel } from "@/components/banking/account-carousel";
 import { PageHeader } from "@/components/layout/page-header";
 import { Explainer } from "@/components/banking/explainer";
 import { Card, CardBody } from "@/components/ui/card";
-import { accounts } from "@/lib/mock/data";
+import { accountsApi } from "@/lib/api";
 
 export const metadata = { title: "Accounts" };
 
-export default function AccountsPage() {
+export default async function AccountsPage() {
+  const accounts = await accountsApi.list();
+
   return (
     <>
       <PageHeader

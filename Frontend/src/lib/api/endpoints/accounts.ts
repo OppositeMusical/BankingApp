@@ -63,7 +63,10 @@ export const accountsApi = {
               }).catch(() => ({ members: [] })),
             ]);
             return subAccounts.subAccounts.map((subAccount) =>
-              toAccount(subAccount, { members: members.members }),
+              toAccount(subAccount, {
+                members: members.members,
+                parentAccountId: account.id,
+              }),
             );
           }),
         );
@@ -89,6 +92,22 @@ export const accountsApi = {
       fixture: () =>
         accountFixtures.find((account) => account.id === id)?.available,
     }),
+
+  /**
+   * Recent activity across several accounts, newest first.
+   *
+   * The contract has no cross-account feed, so this composes the per-account
+   * pages. `limit` bounds both the per-account fetch and the merged result.
+   */
+  activity: async (accountIds: string[], limit = 25): Promise<Transaction[]> => {
+    const pages = await Promise.all(
+      accountIds.map((id) => accountsApi.transactions(id, { limit })),
+    );
+    return pages
+      .flatMap((page) => page.items)
+      .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt))
+      .slice(0, limit);
+  },
 
   transactions: (
     id: string,

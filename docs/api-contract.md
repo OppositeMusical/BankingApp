@@ -96,6 +96,7 @@ Each is handled in the adapter, and each would be better fixed in `openapi.yaml`
 | 7 | **`Transaction.initiatedBy`** | Unset — the contract never says who made a charge on a joint account | Add the acting user to `Transaction` |
 | 8 | **Category vocabularies** | Lossy map; unmapped values become `other` | Reconcile the two enums. UI lacks `dining`, `fuel`, `shopping`, `entertainment`, `subscriptions`, `transfers`; wire lacks `housing`, `childcare`, `personal`, `savings`, `fees`. |
 | 9 | **Flow atomicity** | Rules posted in sequence; a partial failure leaves a partial Flow | A batch endpoint, or a transactional rule-group resource |
+| 10 | **A sub-account's parent** | `SubAccount` doesn't carry its container's id, but `POST /transfers/internal` requires `fromAccountId`. The adapter stores `parentAccountId` from the fetch context (`GET /accounts/{id}/sub-accounts` knows which container it asked), and `toHolder()` rebuilds the pair | Add `parentAccountId` to `SubAccount` |
 
 ## 7. What the backend actually serves
 
@@ -116,6 +117,27 @@ uses, behind an identical signature — so a screen cannot tell which it got.
 **When Go ships an endpoint, move one line in that file.** Nothing else
 changes.
 
+The screens are wired: every page under `(app)/` reads through
+`@/lib/api` (async server components), and the two mutating flows — transfer
+confirm and sign-in/register — call it from client components. Server-side
+calls in live mode go directly to `API_INTERNAL_URL` with the bearer token
+read from the BFF's httpOnly cookie (`src/lib/api/server.ts` registers the
+reader); browser calls go through the same-origin proxy. Domains with no wire
+representation at all (goals, insights, sessions, flow runs — gaps above)
+still import fixtures directly.
+
+Two request-shape notes the registry can't express:
+
+- `POST /transfers/internal` takes `fromAccountId` / `fromSubAccountId` and
+  exactly one of `toAccountId` / `toSubAccountId` / `toUserEmail`. The
+  `sourceAccountId`-style names appear only on the **response** — and the Go
+  decoder rejects unknown fields, so sending them is a 400, not a shrug.
+- The Idempotency-Key for a transfer is minted when the form opens, not on
+  submit, so a double-click cannot move money twice.
+
 > Note the consequence: **Flows has no live backend until `/rules` is ported to
 > Go.** It is the app's headline feature and it currently runs entirely on
-> fixtures.
+> fixtures. Likewise `accounts.subAccounts` is pending, so in live mode the
+> account list itself is still fixture data even though balances and
+> transactions for real wire ids would be served — the screens light up
+> together once Go ships sub-accounts.

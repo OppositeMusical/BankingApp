@@ -14,9 +14,20 @@ import type { Money } from "@/lib/types/banking";
 
 const TransferResponse = oneOf("transfer", TransferSchema);
 
+/**
+ * One side of a transfer, in the wire's vocabulary: the container account,
+ * plus the sub-account within it when there is one. `toHolder()` in
+ * adapters/account.ts builds this from a UI account.
+ */
+export type TransferHolder = {
+  accountId: string;
+  subAccountId?: string;
+};
+
 export type InternalTransfer = {
-  fromSubAccountId: string;
-  toSubAccountId: string;
+  from: TransferHolder;
+  /** Exactly one of the three destination forms, per the contract. */
+  to: TransferHolder | { userEmail: string };
   amount: Money;
   description?: string;
 };
@@ -41,13 +52,24 @@ export const transfersApi = {
   ): Promise<TransferResult> =>
     resolve<TransferResult>("transfers.internal", {
       live: async () => {
+        // Field names follow openapi.yaml exactly — the Go handler rejects
+        // unknown fields, so `sourceAccountId`-style names (which the contract
+        // uses only on the RESPONSE) would 400 here.
+        const to = transfer.to;
         const { transfer: result } = await apiFetch("/transfers/internal", {
           method: "POST",
           idempotencyKey,
           body: {
-            sourceSubAccountId: transfer.fromSubAccountId,
-            destinationSubAccountId: transfer.toSubAccountId,
+            fromAccountId: transfer.from.accountId,
+            fromSubAccountId: transfer.from.subAccountId,
+            ...("userEmail" in to
+              ? { toUserEmail: to.userEmail }
+              : {
+                  toAccountId: to.subAccountId ? undefined : to.accountId,
+                  toSubAccountId: to.subAccountId,
+                }),
             amount: transfer.amount.amount,
+            currency: transfer.amount.currency,
             description: transfer.description,
           },
           schema: TransferResponse,

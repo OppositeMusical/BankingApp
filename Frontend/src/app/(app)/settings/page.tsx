@@ -2,11 +2,15 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Explainer } from "@/components/banking/explainer";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
-import { currentPerson } from "@/lib/mock/data";
+import { redirect } from "next/navigation";
+import { authApi } from "@/lib/api";
 
 export const metadata = { title: "Settings" };
 
-export default function SettingsPage() {
+export default async function SettingsPage() {
+  const currentPerson = await authApi.me();
+  if (!currentPerson) redirect("/signin");
+
   return (
     <>
       <PageHeader

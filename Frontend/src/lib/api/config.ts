@@ -33,3 +33,13 @@ export const apiConfig = {
 } as const;
 
 export const isLive = () => apiConfig.mode === "live";
+
+/**
+ * The httpOnly cookies the BFF proxy writes on login/refresh. Named here so
+ * the proxy and the server-side token reader cannot drift apart. The names are
+ * not secrets — the values never reach JavaScript.
+ */
+export const authCookies = {
+  access: "ba_access",
+  refresh: "ba_refresh",
+} as const;

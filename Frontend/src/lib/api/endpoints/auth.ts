@@ -1,4 +1,5 @@
 import { apiFetch } from "../client";
+import { ApiError } from "../errors";
 import { UserSchema, oneOf } from "../wire";
 import { resolve, withLatency } from "./resolve";
 import { currentPerson } from "@/lib/mock/data";
@@ -39,11 +40,39 @@ export const authApi = {
       fixture: () => withLatency(currentPerson),
     }),
 
+  register: (details: {
+    email: string;
+    name: string;
+    /** The backend requires at least 12 characters. */
+    password: string;
+  }): Promise<Person> =>
+    resolve("auth.register", {
+      live: async () => {
+        // Like login, this goes through the proxy's token exchange: cookies
+        // are set server-side and only the user object comes back.
+        const { user } = await apiFetch("/auth/register", {
+          method: "POST",
+          body: details,
+          schema: MeResponse,
+        });
+        return toPerson(user);
+      },
+      fixture: () => withLatency(currentPerson),
+    }),
+
+  /** The signed-in person, or null when there is no usable session. */
   me: (): Promise<Person | null> =>
     resolve("auth.me", {
       live: async () => {
-        const { user } = await apiFetch("/auth/me", { schema: MeResponse });
-        return toPerson(user);
+        try {
+          const { user } = await apiFetch("/auth/me", { schema: MeResponse });
+          return toPerson(user);
+        } catch (error) {
+          // Signed out is a state, not an exception — the caller decides
+          // whether that means a redirect to /signin.
+          if (error instanceof ApiError && error.isAuthFailure) return null;
+          throw error;
+        }
       },
       fixture: () => withLatency(currentPerson),
     }),

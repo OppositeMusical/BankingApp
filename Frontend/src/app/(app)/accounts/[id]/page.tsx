@@ -7,11 +7,10 @@ import { Explainer } from "@/components/banking/explainer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
-import { accounts, transactions } from "@/lib/mock/data";
+import { accountsApi } from "@/lib/api";
 
-export function generateStaticParams() {
-  return accounts.map((account) => ({ id: account.id }));
-}
+// No generateStaticParams: which accounts exist is per-user data resolved at
+// request time, in both modes, through the connector.
 
 export default async function AccountDetailPage({
   params,
@@ -19,12 +18,11 @@ export default async function AccountDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const account = accounts.find((candidate) => candidate.id === id);
+  const account = await accountsApi.get(id);
   if (!account) notFound();
 
-  const accountTransactions = transactions.filter(
-    (transaction) => transaction.accountId === account.id,
-  );
+  const accountTransactions = (await accountsApi.transactions(account.id))
+    .items;
 
   return (
     <>

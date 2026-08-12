@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Caveat, Fraunces, Inter } from "next/font/google";
 import "./globals.css";
+// Side effect only: registers the cookie-backed auth token source so server
+// components can make authenticated connector calls in live mode.
+import "@/lib/api/server";
 import { UIPreferencesProvider } from "@/lib/store/ui-preferences";
 
 const inter = Inter({

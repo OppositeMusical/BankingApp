@@ -5,10 +5,16 @@ import { usePathname } from "next/navigation";
 import { ArrowLeftRight } from "lucide-react";
 import { mobileNavItems, navItems } from "./nav-items";
 import { PrivacyToggle, ThemeToggle } from "./preference-toggles";
-import { currentPerson } from "@/lib/mock/data";
 import { cn } from "@/lib/utils/cn";
+import type { Person } from "@/lib/types/banking";
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  person,
+  children,
+}: {
+  person: Person;
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
@@ -76,7 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <p className="hidden text-sm text-ink-muted lg:block">
             Signed in as{" "}
             <span className="font-medium text-ink">
-              {currentPerson.displayName}
+              {person.displayName}
             </span>
           </p>
 
@@ -88,7 +94,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               className="ml-1 flex size-11 items-center justify-center rounded-pill bg-accent-soft text-sm font-semibold text-accent"
               title="Profile and settings"
             >
-              <span aria-hidden>{currentPerson.displayName.charAt(0)}</span>
+              <span aria-hidden>{person.displayName.charAt(0)}</span>
               <span className="sr-only">Profile and settings</span>
             </Link>
           </div>
