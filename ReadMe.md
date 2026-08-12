@@ -535,3 +535,4 @@ When [`Backend/`](Backend/) is built, these frontend assumptions matter:
 7. **Echo `X-Request-ID`** so client and server logs can be correlated.
 8. **Auth**: short-lived access token + rotating refresh token; the Next.js BFF
    holds both, the browser holds neither.
+

@@ -1,4 +1,4 @@
-import { AccountCard } from "@/components/banking/account-card";
+import { AccountCarousel } from "@/components/banking/account-carousel";
 import { PageHeader } from "@/components/layout/page-header";
 import { Explainer } from "@/components/banking/explainer";
 import { Card, CardBody } from "@/components/ui/card";
@@ -14,11 +14,7 @@ export default function AccountsPage() {
         description="Every account, and exactly who else can see it."
       />
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        {accounts.map((account) => (
-          <AccountCard key={account.id} account={account} />
-        ))}
-      </div>
+      <AccountCarousel accounts={accounts} />
 
       <Card className="mt-6">
         <CardBody className="pt-5">

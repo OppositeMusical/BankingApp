@@ -4,7 +4,7 @@ import { Amount } from "@/components/banking/amount";
 import { Badge } from "@/components/ui/badge";
 import type { Account } from "@/lib/types/banking";
 
-const kindLabels: Record<Account["kind"], string> = {
+export const kindLabels: Record<Account["kind"], string> = {
   checking: "Checking",
   savings: "Savings",
   goal: "Goal",
@@ -50,7 +50,7 @@ export function AccountCard({ account }: { account: Account }) {
  * Who can see this account, stated on the account itself. Shared visibility is
  * something you should never have to go looking for.
  */
-function VisibilityBadge({ account }: { account: Account }) {
+export function VisibilityBadge({ account }: { account: Account }) {
   if (account.visibility === "joint" && account.sharedWith.length > 0) {
     return (
       <Badge tone="accent">

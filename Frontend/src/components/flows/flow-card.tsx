@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, Pause, Play } from "lucide-react";
-import { FlowDiagram } from "./flow-diagram";
+import { FlowGraph } from "./flow-graph";
 import { FlowStateBadge } from "./flow-state-badge";
-import { Amount } from "@/components/banking/amount";
 import { describeCadence } from "@/lib/flows/destinations";
 import type { Flow, FlowState } from "@/lib/types/flows";
 import { cn } from "@/lib/utils/cn";
@@ -64,14 +63,15 @@ export function FlowCard({ flow, tilt }: { flow: Flow; tilt: "a" | "b" }) {
           <FlowStateBadge state={state} />
         </div>
 
-        {flow.source.typicalAmount && (
-          <p className="mt-3 text-sm text-ink-muted">
-            Usually <Amount value={flow.source.typicalAmount} compactWhole />
-          </p>
-        )}
-
-        <div className="mt-3 border-t border-paper-edge pt-2">
-          <FlowDiagram splits={flow.splits} compact />
+        {/* The split, drawn. The deposit is the diagram's source node, so it
+            isn't also stated as a line of prose above it. */}
+        <div className="mt-4">
+          <FlowGraph
+            splits={flow.splits}
+            typicalAmount={flow.source.typicalAmount}
+            sourceLabel="Usually arrives"
+            compact
+          />
         </div>
 
         {state === "needs-attention" && flow.attentionReason && (
