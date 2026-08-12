@@ -5,12 +5,33 @@ import { Explainer } from "@/components/banking/explainer";
 import { Amount } from "@/components/banking/amount";
 import { StatTile } from "@/components/banking/stat-tile";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { NoData } from "@/components/banking/no-data";
+import { showingSample } from "@/lib/api/sample";
 import { feeSummary, monthlyTrend, spendingByCategory } from "@/lib/mock/data";
 import { sumMoney } from "@/lib/format/money";
 
 export const metadata = { title: "Insights" };
 
 export default function InsightsPage() {
+  // Every figure here comes from fixtures — spending slices, the six-month
+  // trend, the fee comparison. None of it has an endpoint, so in live mode
+  // there is nothing to compute from and nothing honest to show.
+  if (!showingSample()) {
+    return (
+      <>
+        <PageHeader
+          title="Insights"
+          description="Where your money went, in plain numbers."
+        />
+        <NoData title="No spending data yet">
+          Insights are built from categorised transactions, spending totals and
+          a fee comparison — none of which the banking service publishes yet.
+          Switch to sample data to see the finished screen.
+        </NoData>
+      </>
+    );
+  }
+
   const thisMonth = monthlyTrend[monthlyTrend.length - 1];
   const totalSpent = sumMoney(
     spendingByCategory.map((slice) => slice.total),

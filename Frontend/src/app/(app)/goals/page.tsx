@@ -3,6 +3,8 @@ import { GoalCard } from "@/components/banking/goal-card";
 import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { CareerPausePlanner } from "./career-pause-planner";
+import { NoData } from "@/components/banking/no-data";
+import { showingSample } from "@/lib/api/sample";
 import { careerPause, goals } from "@/lib/mock/data";
 import { sumMoney } from "@/lib/format/money";
 import { Amount } from "@/components/banking/amount";
@@ -10,6 +12,25 @@ import { Amount } from "@/components/banking/amount";
 export const metadata = { title: "Goals" };
 
 export default function GoalsPage() {
+  // Goals cannot round-trip: the contract's SubAccount has no target amount or
+  // target date (gap #2 in docs/api-contract.md), so there is no such thing as
+  // a real goal to fetch.
+  if (!showingSample()) {
+    return (
+      <>
+        <PageHeader
+          title="Goals"
+          description="Money set aside for the things you're actually planning for."
+        />
+        <NoData title="No goals yet">
+          Goals need a target amount and a target date, which the banking
+          service doesn&apos;t store yet. Switch to sample data to see how goals
+          and the career-break planner work.
+        </NoData>
+      </>
+    );
+  }
+
   const totalSaved = sumMoney(
     goals.map((goal) => goal.saved),
     "USD",

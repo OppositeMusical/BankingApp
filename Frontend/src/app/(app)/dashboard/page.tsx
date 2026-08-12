@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { accountsApi, authApi } from "@/lib/api";
 // Goals, fees, and the monthly trend have no wire representation yet
 // (docs/api-contract.md §6), so they still come from fixtures.
+import { showingSample } from "@/lib/api/sample";
 import { feeSummary, goals, monthlyTrend } from "@/lib/mock/data";
 import { sumMoney } from "@/lib/format/money";
 
@@ -29,6 +30,10 @@ export default async function DashboardPage() {
     depositAccounts.map((a) => a.balance),
     "USD",
   );
+  // Balances, accounts and activity are real. The month KPIs, the fee
+  // breakdown and goals are fixtures with no endpoint behind them, so they are
+  // hidden entirely in live mode rather than shown with invented figures.
+  const sample = showingSample();
   const thisMonth = monthlyTrend[monthlyTrend.length - 1];
   const savedThisMonth = sumMoney(
     goals.map((g) => g.monthlyContribution ?? { amount: 0, currency: "USD" }),
@@ -68,7 +73,8 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      {/* KPI row */}
+      {/* KPI row — fixture-derived */}
+      {sample && (
       <section aria-labelledby="month-heading" className="mb-8">
         <h2 id="month-heading" className="sr-only">
           This month at a glance
@@ -91,8 +97,10 @@ export default async function DashboardPage() {
           />
         </div>
       </section>
+      )}
 
-      {/* Fee transparency */}
+      {/* Fee transparency — fixture-derived */}
+      {sample && (
       <Card className="mb-8">
         <CardHeader>
           <div>
@@ -129,6 +137,7 @@ export default async function DashboardPage() {
           </Explainer>
         </CardBody>
       </Card>
+      )}
 
       {/* Accounts */}
       <section aria-labelledby="accounts-heading" className="mb-8">
@@ -154,7 +163,8 @@ export default async function DashboardPage() {
         </div>
       </section>
 
-      {/* Goals */}
+      {/* Goals — fixture-derived; goals cannot round-trip through the wire */}
+      {sample && (
       <section aria-labelledby="goals-heading" className="mb-8">
         <div className="mb-3 flex items-center justify-between">
           <h2
@@ -173,6 +183,7 @@ export default async function DashboardPage() {
           ))}
         </div>
       </section>
+      )}
 
       {/* Recent activity */}
       <section aria-labelledby="activity-heading">

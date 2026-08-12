@@ -30,6 +30,10 @@ export const flowsApi = {
         return toFlows(rules);
       },
       fixture: () => withLatency(flowFixtures),
+      // /rules is not implemented, so in live mode the user has no flows.
+      // The flows page's empty state teaches the concept with a worked
+      // example, which is a far better answer than three invented flows.
+      empty: () => [],
     }),
 
   get: (id: string): Promise<Flow | undefined> =>

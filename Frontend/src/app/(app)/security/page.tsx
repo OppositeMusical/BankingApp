@@ -4,11 +4,18 @@ import { SessionList } from "./session-list";
 import { Explainer } from "@/components/banking/explainer";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
+import { NoData } from "@/components/banking/no-data";
+import { showingSample } from "@/lib/api/sample";
 import { cards, sessions } from "@/lib/mock/data";
 
 export const metadata = { title: "Security" };
 
 export default function SecurityPage() {
+  // /cards is unimplemented and sessions have no endpoint at all, so in live
+  // mode both lists would be invented. The trusted-contact panel below is
+  // static copy and stays either way.
+  const sample = showingSample();
+
   return (
     <>
       <PageHeader
@@ -20,14 +27,26 @@ export default function SecurityPage() {
         <h2 className="mb-3 font-display text-xl font-semibold text-ink">
           Cards
         </h2>
-        <CardControls cards={cards} />
+        {sample ? (
+          <CardControls cards={cards} />
+        ) : (
+          <NoData title="No cards yet">
+            Card issuing isn&apos;t connected to the banking service yet.
+          </NoData>
+        )}
       </section>
 
       <section className="mb-6">
         <h2 className="mb-3 font-display text-xl font-semibold text-ink">
           Where you&apos;re signed in
         </h2>
-        <SessionList sessions={sessions} />
+        {sample ? (
+          <SessionList sessions={sessions} />
+        ) : (
+          <NoData title="No session data yet">
+            The banking service doesn&apos;t publish signed-in devices yet.
+          </NoData>
+        )}
       </section>
 
       <Card className="mb-6">

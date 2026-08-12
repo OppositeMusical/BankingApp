@@ -111,6 +111,7 @@ export const accountsApi = {
       },
       fixture: () =>
         accountFixtures.find((account) => account.id === id)?.available,
+      empty: () => undefined,
     }),
 
   /**
@@ -154,5 +155,6 @@ export const accountsApi = {
           nextCursor: null,
           hasMore: false,
         }),
+      empty: () => ({ items: [], nextCursor: null, hasMore: false }),
     }),
 };

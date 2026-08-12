@@ -32,19 +32,36 @@ export async function resolve<T>(
     live: () => Promise<T>;
     fixture: () => T | Promise<T>;
     /**
+     * What to show in live mode when the backend cannot answer.
+     *
+     * Live mode must never invent data. If an operation is unimplemented, the
+     * honest answer is nothing — an empty list, an undefined value — and the
+     * screen's empty state. Falling back to fixtures here is what made a real
+     * account sit next to three invented ones with no way to tell them apart.
+     *
+     * Where this is omitted the fixture is used, which is correct only for
+     * data that is presentational rather than the user's own.
+     */
+    empty?: () => T | Promise<T>;
+    /**
      * Ids this call addresses. If any of them did not come from the backend,
-     * the live branch cannot answer for them and fixtures are used instead.
+     * the live branch cannot answer for them.
      */
     scopedTo?: string | string[];
   },
 ): Promise<T> {
-  if (!isLive() || !isServed(operation)) return branches.fixture();
+  if (!isLive()) return branches.fixture();
 
-  if (branches.scopedTo !== undefined) {
-    const ids = Array.isArray(branches.scopedTo)
-      ? branches.scopedTo
-      : [branches.scopedTo];
-    if (ids.some((id) => !isWireId(id))) return branches.fixture();
+  const unanswerable =
+    !isServed(operation) ||
+    (branches.scopedTo !== undefined &&
+      (Array.isArray(branches.scopedTo)
+        ? branches.scopedTo
+        : [branches.scopedTo]
+      ).some((id) => !isWireId(id)));
+
+  if (unanswerable) {
+    return branches.empty ? branches.empty() : branches.fixture();
   }
 
   return branches.live();

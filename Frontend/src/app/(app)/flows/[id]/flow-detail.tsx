@@ -17,6 +17,7 @@ import {
   sharedViewers,
 } from "@/lib/flows/destinations";
 import { formatFullDate } from "@/lib/format/date";
+import { sample } from "@/lib/api/sample";
 import { flowRuns } from "@/lib/mock/flows";
 import { deleteUserFlow, useUserFlows } from "@/lib/store/user-flows";
 import type { Flow } from "@/lib/types/flows";
@@ -53,7 +54,9 @@ export function FlowDetail({
     );
   }
 
-  const runs = flowRuns
+  // Run history has no endpoint; in live mode the "what actually happened"
+  // section shows its own empty state rather than invented receipts.
+  const runs = sample(flowRuns, [])
     .filter((run) => run.flowId === flow.id)
     .sort((a, b) => b.occurredAt.localeCompare(a.occurredAt));
   const viewers = sharedViewers(flow.splits.map((split) => split.destination));

@@ -18,7 +18,23 @@ import "@xyflow/react/dist/style.css";
 import { Plus } from "lucide-react";
 import { flowNodeTypes } from "./canvas-nodes";
 import { remainderPercentage, totalPercentage } from "@/lib/flows/split-deposit";
-import { accounts, goals } from "@/lib/mock/data";
+import { sample } from "@/lib/api/sample";
+import {
+  accounts as accountFixtures,
+  goals as goalFixtures,
+} from "@/lib/mock/data";
+
+// Destination options are fixtures. Live mode offers none rather than
+// offering accounts that do not exist.
+//
+// Resolved at call time, not at module scope: module code runs at import,
+// before <ApiModeSync> has told the client what the server resolved, so a
+// module-level value would use the build-time mode and could disagree with
+// the server's markup.
+const destinationFixtures = () => ({
+  accounts: sample(accountFixtures, []),
+  goals: sample(goalFixtures, []),
+});
 import type { Money } from "@/lib/types/banking";
 import type { FlowDestination, FlowSplit } from "@/lib/types/flows";
 
@@ -330,11 +346,11 @@ function FlowCanvasInner({
 
   const availableDestinations = useMemo(() => {
     const options: { label: string; destination: FlowDestination }[] = [
-      ...accounts.map((account) => ({
+      ...destinationFixtures().accounts.map((account) => ({
         label: account.name,
         destination: { kind: "account" as const, accountId: account.id },
       })),
-      ...goals.map((goal) => ({
+      ...destinationFixtures().goals.map((goal) => ({
         label: goal.name,
         destination: { kind: "goal" as const, goalId: goal.id },
       })),

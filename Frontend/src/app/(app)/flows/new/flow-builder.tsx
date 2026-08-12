@@ -22,8 +22,25 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { describeCadence, resolveDestination, sharedViewers } from "@/lib/flows/destinations";
 import { splitDeposit } from "@/lib/flows/split-deposit";
-import { accounts } from "@/lib/mock/data";
-import { flows, sourceSuggestions } from "@/lib/mock/flows";
+import { sample } from "@/lib/api/sample";
+import { accounts as accountFixtures } from "@/lib/mock/data";
+import { flows as flowFixtures, sourceSuggestions as sourceFixtures } from "@/lib/mock/flows";
+
+/*
+ * The builder runs entirely on fixtures: detected payers, destination accounts
+ * and existing flows all come from lib/mock. None has an endpoint, so in live
+ * mode each is empty and the steps fall through to their own empty states.
+ *
+ * Read at call time rather than module scope. Module code runs at import,
+ * before <ApiModeSync> has told the client what the server resolved, so a
+ * module-level value would use the build-time mode and could disagree with the
+ * server's markup.
+ */
+const builderFixtures = () => ({
+  accounts: sample(accountFixtures, []),
+  flows: sample(flowFixtures, []),
+  sourceSuggestions: sample(sourceFixtures, []),
+});
 import { formatMoney } from "@/lib/format/money";
 import type { Flow, FlowSourceSuggestion, FlowSplit } from "@/lib/types/flows";
 import { cn } from "@/lib/utils/cn";
@@ -164,7 +181,7 @@ function StepSource({
   // Sorted by total received, not by date — the main income comes first.
   const sorted = useMemo(
     () =>
-      [...sourceSuggestions].sort(
+      [...builderFixtures().sourceSuggestions].sort(
         (a, b) => b.totalReceived.amount - a.totalReceived.amount,
       ),
     [],
@@ -179,7 +196,7 @@ function StepSource({
 
       <ul className="flex flex-col gap-3">
         {sorted.map((suggestion) => {
-          const arrivesIn = accounts.find(
+          const arrivesIn = builderFixtures().accounts.find(
             (a) => a.id === suggestion.arrivesInAccountId,
           );
           const claimed = suggestion.alreadyUsed;
@@ -418,7 +435,7 @@ function StepPreview({
   const viewers = sharedViewers(splits.map((split) => split.destination));
 
   // A payer may only be claimed by one flow.
-  const conflict = flows.find(
+  const conflict = builderFixtures().flows.find(
     (existing) => existing.source.displayName === source.displayName,
   );
 

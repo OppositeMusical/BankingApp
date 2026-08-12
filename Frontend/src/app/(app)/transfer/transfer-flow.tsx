@@ -6,6 +6,7 @@ import { ArrowRight, Check, TriangleAlert } from "lucide-react";
 import { Amount } from "@/components/banking/amount";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
+import { NoData } from "@/components/banking/no-data";
 import { describeError, toHolder, transfersApi } from "@/lib/api";
 import { formatMoney } from "@/lib/format/money";
 import type { Account, Money } from "@/lib/types/banking";
@@ -23,9 +24,14 @@ type Step = "amount" | "review" | "done";
  * impatient re-confirm can only ever produce one transfer.
  */
 export function TransferFlow({ accounts }: { accounts: Account[] }) {
+  // Two distinct accounts are the minimum for an internal transfer. The
+  // fixtures always had four, so indexing straight into [0] and [2] looked
+  // safe; against a real backend a new user has one account and that threw.
+  const enough = accounts.length >= 2;
+
   const [step, setStep] = useState<Step>("amount");
-  const [fromId, setFromId] = useState(accounts[0].id);
-  const [toId, setToId] = useState(accounts[2].id);
+  const [fromId, setFromId] = useState(accounts[0]?.id ?? "");
+  const [toId, setToId] = useState(accounts[1]?.id ?? "");
   const [amountInput, setAmountInput] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [idempotencyKey, setIdempotencyKey] = useState(() =>
@@ -33,12 +39,25 @@ export function TransferFlow({ accounts }: { accounts: Account[] }) {
   );
   const [submitting, setSubmitting] = useState(false);
 
-  const from = accounts.find((account) => account.id === fromId)!;
-  const to = accounts.find((account) => account.id === toId)!;
+  const from = accounts.find((account) => account.id === fromId);
+  const to = accounts.find((account) => account.id === toId);
 
   // Parse to integer minor units — never carry money as a float.
   const parsed = Math.round(Number.parseFloat(amountInput || "0") * 100);
   const amount: Money = { amount: parsed, currency: "USD" };
+
+  // Every hook above runs unconditionally, so returning here is safe. The
+  // whole form assumes both sides exist; one guard beats threading optionals
+  // through every step of it.
+  if (!enough || !from || !to) {
+    return (
+      <NoData title="You need two accounts to transfer between">
+        Internal transfers move money between your own accounts, and there is
+        only one here so far. Once a second account exists, this is where
+        you&apos;ll move money between them.
+      </NoData>
+    );
+  }
 
   const validate = () => {
     if (!Number.isFinite(parsed) || parsed <= 0) {
@@ -47,6 +66,10 @@ export function TransferFlow({ accounts }: { accounts: Account[] }) {
     }
     if (fromId === toId) {
       setError("Choose two different accounts.");
+      return false;
+    }
+    if (!from || !to) {
+      setError("Choose both accounts.");
       return false;
     }
     if (parsed > from.available.amount) {

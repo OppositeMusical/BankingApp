@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { FlowCard } from "@/components/flows/flow-card";
+import { showingSample } from "@/lib/api/sample";
 import { useUserFlows } from "@/lib/store/user-flows";
 import type { Flow } from "@/lib/types/flows";
 
@@ -17,7 +18,7 @@ export function FlowsGrid({ exampleFlows }: { exampleFlows: Flow[] }) {
   const userFlows = useUserFlows();
   const all = [...userFlows, ...exampleFlows];
 
-  if (all.length === 0) return <FlowsEmptyState />;
+  if (all.length === 0) return <FlowsEmptyState sample={showingSample()} />;
 
   return (
     <div className="grain relative -mx-2 grid gap-8 px-2 py-4 sm:grid-cols-2 sm:gap-x-6">
@@ -36,7 +37,30 @@ export function FlowsGrid({ exampleFlows }: { exampleFlows: Flow[] }) {
  * The empty state does real work: it teaches the concept with a worked example
  * rather than showing an illustration and a button.
  */
-function FlowsEmptyState() {
+function FlowsEmptyState({ sample }: { sample: boolean }) {
+  // The worked example names a payer and four destinations. That reads as
+  // account data, so in live mode it is replaced by the same teaching in
+  // prose — the concept still lands, without anything that looks like a
+  // balance somebody owns.
+  if (!sample) {
+    return (
+      <div className="grain relative">
+        <div className="paper tilt-a taped relative mx-auto max-w-lg p-7">
+          <h2 className="font-hand text-3xl text-ink">Your first flow</h2>
+          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+            A flow splits a deposit the moment it arrives, by percentages you
+            set — so a lean month needs no re-planning, and money is set aside
+            before you can spend it.
+          </p>
+          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+            Flows aren&apos;t connected to the banking service yet, so there is
+            nothing here to show. Switch to sample data to see a worked example.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="grain relative">
       <div className="paper tilt-a taped relative mx-auto max-w-lg p-7">
