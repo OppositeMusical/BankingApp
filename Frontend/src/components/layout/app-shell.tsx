@@ -6,13 +6,17 @@ import { ArrowLeftRight } from "lucide-react";
 import { mobileNavItems, navItems } from "./nav-items";
 import { PrivacyToggle, ThemeToggle } from "./preference-toggles";
 import { cn } from "@/lib/utils/cn";
+import type { ApiMode } from "@/lib/api/config";
 import type { Person } from "@/lib/types/banking";
 
 export function AppShell({
   person,
+  mode,
   children,
 }: {
   person: Person;
+  /** Where the data on screen came from. Shown, never guessed at. */
+  mode: ApiMode;
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
@@ -87,6 +91,7 @@ export function AppShell({
           </p>
 
           <div className="flex items-center gap-1">
+            <DataSourceBadge mode={mode} />
             <PrivacyToggle />
             <ThemeToggle />
             <Link
@@ -132,6 +137,42 @@ export function AppShell({
         </ul>
       </nav>
     </div>
+  );
+}
+
+/**
+ * Which data source is on screen.
+ *
+ * Worth the header space: in `live` the app still falls back to fixtures for
+ * the domains the backend hasn't implemented, so "is this real?" is a genuine
+ * question with a non-obvious answer. Stating it beats letting someone infer
+ * it from whether the numbers look plausible.
+ */
+function DataSourceBadge({ mode }: { mode: ApiMode }) {
+  const sample = mode === "mock";
+  return (
+    <span
+      title={
+        sample
+          ? "Every screen is rendering sample data. No backend is being called."
+          : "Reading from the API where it's implemented; sample data fills the rest."
+      }
+      className={cn(
+        "mr-1 hidden items-center gap-1.5 rounded-pill border px-2.5 py-1 text-xs font-medium sm:inline-flex",
+        sample
+          ? "border-border text-ink-muted"
+          : "border-positive/40 text-positive",
+      )}
+    >
+      <span
+        aria-hidden
+        className={cn(
+          "size-1.5 rounded-pill",
+          sample ? "bg-ink-subtle" : "bg-positive",
+        )}
+      />
+      {sample ? "Sample data" : "Live data"}
+    </span>
   );
 }
 

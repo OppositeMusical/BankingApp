@@ -4,6 +4,8 @@ import "./globals.css";
 // Side effect only: registers the cookie-backed auth token source so server
 // components can make authenticated connector calls in live mode.
 import "@/lib/api/server";
+import { apiMode } from "@/lib/api/config";
+import { ApiModeSync } from "@/lib/api/mode-sync";
 import { UIPreferencesProvider } from "@/lib/store/ui-preferences";
 
 const inter = Inter({
@@ -77,6 +79,8 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="min-h-full">
+        {/* Resolved on the server, where API_MODE is readable. */}
+        <ApiModeSync mode={apiMode()} />
         <UIPreferencesProvider>{children}</UIPreferencesProvider>
       </body>
     </html>

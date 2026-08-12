@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { SignInForm } from "./signin-form";
-import { apiConfig } from "@/lib/api";
+import { apiMode } from "@/lib/api/config";
 
 export const metadata = { title: "Sign in" };
 
@@ -35,7 +35,7 @@ export default function SignInPage() {
           </span>
         </Link>
 
-        <SignInForm mockMode={apiConfig.mode === "mock"} />
+        <SignInForm mockMode={apiMode() === "mock"} />
       </div>
     </main>
   );

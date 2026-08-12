@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { authApi } from "@/lib/api";
+import { apiMode } from "@/lib/api/config";
 
 /**
  * Everything below this layout is per-user and authenticated, so none of it may
@@ -20,5 +21,9 @@ export default async function AuthenticatedLayout({
   const person = await authApi.me();
   if (!person) redirect("/signin");
 
-  return <AppShell person={person}>{children}</AppShell>;
+  return (
+    <AppShell person={person} mode={apiMode()}>
+      {children}
+    </AppShell>
+  );
 }
