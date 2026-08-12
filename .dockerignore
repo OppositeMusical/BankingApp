@@ -1,0 +1,25 @@
+# Build context is the repo root, so this has to exclude the heavy and the
+# irrelevant. A stale Frontend/.next in particular can shadow the build the
+# image is meant to produce.
+**/node_modules
+**/.next
+**/out
+**/build
+**/coverage
+
+.git
+.gitignore
+Dockerfile
+.dockerignore
+
+# Never let a real environment file into an image layer.
+**/.env
+**/.env.*
+!**/.env.example
+
+# Not part of the app.
+docs/
+ReadMe.md
+**/*.log
+**/.DS_Store
+**/*.pem
