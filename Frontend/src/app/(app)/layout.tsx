@@ -2,6 +2,14 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/layout/app-shell";
 import { authApi } from "@/lib/api";
 
+/**
+ * Everything below this layout is per-user and authenticated, so none of it may
+ * be prerendered. Beyond being wrong on its own terms — a build has no session
+ * — a static render in live mode reaches for the API at build time, when no
+ * backend is running and no cookie exists. Applies to every nested segment.
+ */
+export const dynamic = "force-dynamic";
+
 export default async function AuthenticatedLayout({
   children,
 }: {

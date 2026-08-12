@@ -1,15 +1,9 @@
 import { FlowDetail } from "./flow-detail";
 import { flowsApi } from "@/lib/api";
-import { flows } from "@/lib/mock/flows";
 
-/**
- * Example flows are prerendered; user-built ones resolve on the client. The
- * params come straight from fixtures because build-time prerendering is
- * exactly the case where no backend is reachable.
- */
-export function generateStaticParams() {
-  return flows.map((flow) => ({ id: flow.id }));
-}
+// No generateStaticParams: it enumerated fixture ids, which prerenders pages
+// for flows that do not exist against a live backend — and the parent layout
+// is force-dynamic regardless, since this is authenticated per-user data.
 
 export default async function FlowDetailPage({
   params,
