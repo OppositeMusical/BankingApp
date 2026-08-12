@@ -62,9 +62,12 @@ describe("resolve", () => {
     expect(b.live).not.toHaveBeenCalled();
   });
 
+  // Deliberately an operation from `pendingOperations`. Using a served one
+  // makes this test pass for the wrong reason the moment Go ships it — which
+  // is exactly what happened when rules.list went live.
   it("uses fixtures for an unimplemented operation regardless of id", async () => {
     const b = branches();
-    const result = await resolve("rules.list", {
+    const result = await resolve("brokerage.holdings", {
       ...b,
       scopedTo: "30172bfa-6e88-4648-987d-3b942df3e6c5",
     });
