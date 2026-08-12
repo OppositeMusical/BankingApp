@@ -83,6 +83,7 @@ export const accountsApi = {
 
   balance: (id: string): Promise<Money | undefined> =>
     resolve("accounts.balance", {
+      scopedTo: id,
       live: async () => {
         const { balance } = await apiFetch(`/accounts/${id}/balance`, {
           schema: BalanceResponse,
@@ -114,6 +115,7 @@ export const accountsApi = {
     query: TransactionQuery = {},
   ): Promise<Page<Transaction>> =>
     resolve("accounts.transactions", {
+      scopedTo: id,
       live: async () => {
         const response = await apiFetch(`/accounts/${id}/transactions`, {
           query,
