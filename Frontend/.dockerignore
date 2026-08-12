@@ -1,0 +1,24 @@
+# Keep the build context small and reproducible. Without this, a local
+# `docker build` uploads node_modules and .next — hundreds of megabytes — and
+# worse, a stale .next can shadow the one the build is meant to produce.
+node_modules
+.next
+out
+build
+coverage
+
+.git
+.gitignore
+Dockerfile
+.dockerignore
+
+# Never let a real environment file into an image layer.
+.env
+.env.*
+!.env.example
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+*.pem
