@@ -9,12 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { brokerageApi, describeError } from "@/lib/api";
 import { formatFullDate } from "@/lib/format/date";
+import { MarketPanel } from "./market-panel";
 import { nameFor, searchSymbols } from "@/lib/market/symbols";
 import type {
   BrokerageAccount,
   Holding,
   Order,
 } from "@/lib/api/endpoints/brokerage";
+import type { Quote } from "@/lib/market/quotes";
 import type { Money } from "@/lib/types/banking";
 import { cn } from "@/lib/utils/cn";
 
@@ -25,11 +27,13 @@ export function TradeDesk({
   account,
   holdings,
   orders,
+  quotes,
   fundingAccountId,
 }: {
   account: BrokerageAccount | null;
   holdings: Holding[];
   orders: Order[];
+  quotes: Quote[];
   fundingAccountId: string;
 }) {
   const router = useRouter();
@@ -74,6 +78,7 @@ export function TradeDesk({
   const suggestions = useMemo(() => searchSymbols(symbol), [symbol]);
   const typed = symbol.trim().toUpperCase();
   const quote = lastPrice.get(typed);
+  const marketQuote = quotes.find((entry) => entry.symbol === typed);
 
   const positions = holdings.map((holding) => {
     const price = lastPrice.get(holding.symbol)?.price;
@@ -144,6 +149,8 @@ export function TradeDesk({
           caption={account ? "Settled" : "Opens with your first order"}
         />
       </div>
+
+      <MarketPanel initialQuotes={quotes} onPick={setSymbol} />
 
       <Card className="mb-6">
         <CardHeader>
@@ -222,13 +229,24 @@ export function TradeDesk({
             <p className="mt-3 text-sm text-ink-muted">
               <span className="font-medium text-ink">{typed}</span>
               {nameFor(typed) && ` · ${nameFor(typed)}`}
+              {marketQuote && (
+                <>
+                  {" · market "}
+                  <span className="tabular text-ink">
+                    {marketQuote.price.toLocaleString("en-US", {
+                      style: "currency",
+                      currency: marketQuote.currency,
+                    })}
+                  </span>
+                </>
+              )}
               {quote ? (
                 <>
-                  {" · last traded at "}
+                  {" · your last fill "}
                   <Amount value={quote.price} />
                 </>
               ) : (
-                " · no price yet — the first order sets one"
+                " · no fill yet"
               )}
             </p>
           )}

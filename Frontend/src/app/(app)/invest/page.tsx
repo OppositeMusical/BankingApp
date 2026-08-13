@@ -4,6 +4,8 @@ import { Explainer } from "@/components/banking/explainer";
 import { TradeDesk } from "./trade-desk";
 import { accountsApi, brokerageApi } from "@/lib/api";
 import { showingSample } from "@/lib/api/sample";
+import { fetchQuotes } from "@/lib/market/quotes";
+import { symbols as catalogue } from "@/lib/market/symbols";
 
 export const metadata = { title: "Invest" };
 
@@ -27,6 +29,15 @@ export default async function InvestPage() {
     accountsApi.list(),
   ]);
 
+  // What you hold first, then the catalogue — a positions screen should open
+  // on your own money, not on someone's idea of a default watchlist.
+  const held = holdings.map((holding) => holding.symbol);
+  const watchlist = [
+    ...held,
+    ...catalogue.map((entry) => entry.symbol).filter((s) => !held.includes(s)),
+  ].slice(0, 8);
+  const quotes = await fetchQuotes(watchlist);
+
   return (
     <>
       <PageHeader title="Invest" description="Paper trading, with real cash." />
@@ -35,6 +46,7 @@ export default async function InvestPage() {
         account={account}
         holdings={holdings}
         orders={orders}
+        quotes={quotes}
         fundingAccountId={accounts[0]?.parentAccountId ?? accounts[0]?.id ?? ""}
       />
 
