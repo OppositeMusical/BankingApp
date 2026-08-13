@@ -103,6 +103,10 @@ export type Card = {
   last4: string;
   status: "active" | "frozen";
   expiry: string;
+  /** Present on wire cards; fixtures predate it. */
+  virtual?: boolean;
+  /** Per-transaction ceiling, when one is set. */
+  limit?: Money;
 };
 
 export type Session = {

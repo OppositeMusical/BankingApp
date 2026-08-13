@@ -8,17 +8,19 @@ import { TransactionRow } from "@/components/banking/transaction-row";
 import { Explainer } from "@/components/banking/explainer";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { accountsApi, authApi } from "@/lib/api";
+import { accountsApi, authApi, cardsApi } from "@/lib/api";
 // Goals, fees, and the monthly trend have no wire representation yet
 // (docs/api-contract.md §6), so they still come from fixtures.
+import { CardControls } from "../security/card-controls";
 import { showingSample } from "@/lib/api/sample";
 import { feeSummary, goals, monthlyTrend } from "@/lib/mock/data";
 import { sumMoney } from "@/lib/format/money";
 
 export default async function DashboardPage() {
-  const [person, accounts] = await Promise.all([
+  const [person, accounts, cards] = await Promise.all([
     authApi.me(),
     accountsApi.list(),
+    cardsApi.list(),
   ]);
   const recent = await accountsApi.activity(accounts, 5);
 
@@ -180,6 +182,29 @@ export default async function DashboardPage() {
           ))}
         </div>
       </section>
+      )}
+
+      {/* Cards — real in live mode; the same component Security uses, so
+          freezing behaves identically in both places. */}
+      {cards.length > 0 && (
+        <section aria-labelledby="cards-heading" className="mb-8">
+          <div className="mb-3 flex items-center justify-between">
+            <h2
+              id="cards-heading"
+              className="font-display text-xl font-semibold text-ink"
+            >
+              Cards
+            </h2>
+            <Link
+              href="/security"
+              className="inline-flex items-center gap-1 rounded-field text-sm font-medium text-accent hover:underline"
+            >
+              Manage
+              <ArrowRight className="size-3.5" aria-hidden />
+            </Link>
+          </div>
+          <CardControls cards={cards} />
+        </section>
       )}
 
       {/* Recent activity */}

@@ -2,31 +2,50 @@
 
 import { useState } from "react";
 import { CreditCard, Snowflake } from "lucide-react";
+import { Amount } from "@/components/banking/amount";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card as Surface } from "@/components/ui/card";
+import { cardsApi, describeError } from "@/lib/api";
 import type { Card } from "@/lib/types/banking";
 
 /**
- * Freezing is instant and reversible, and deliberately takes one tap from the
- * security page — the moment you need it is the moment you don't want a flow.
+ * Freezing is instant and reversible, and deliberately takes one tap — the
+ * moment you need it is the moment you don't want a flow.
+ *
+ * The state is optimistic and then reconciled: the badge flips immediately
+ * because that is what makes it feel instant, but the API call is what decides.
+ * If it fails the toggle goes back and says so, because a card that shows
+ * "Frozen" while the network never heard about it is worse than no button.
  */
 export function CardControls({ cards }: { cards: Card[] }) {
   const [frozen, setFrozen] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(cards.map((card) => [card.id, card.status === "frozen"])),
   );
   const [announcement, setAnnouncement] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState<string | null>(null);
 
-  const toggle = (card: Card) => {
-    setFrozen((current) => {
-      const next = !current[card.id];
+  const toggle = async (card: Card) => {
+    const next = !frozen[card.id];
+    setFrozen((current) => ({ ...current, [card.id]: next }));
+    setPending(card.id);
+    setError(null);
+
+    try {
+      await cardsApi.setFrozen(card.id, next);
       setAnnouncement(
         next
           ? `${card.label} is frozen. No new payments will go through.`
           : `${card.label} is active again.`,
       );
-      return { ...current, [card.id]: next };
-    });
+    } catch (err) {
+      setFrozen((current) => ({ ...current, [card.id]: !next }));
+      setError(describeError(err));
+      setAnnouncement("That didn't work. The card is unchanged.");
+    } finally {
+      setPending(null);
+    }
   };
 
   return (
@@ -34,6 +53,11 @@ export function CardControls({ cards }: { cards: Card[] }) {
       <p aria-live="polite" className="sr-only">
         {announcement}
       </p>
+      {error && (
+        <p role="alert" className="mb-3 text-sm text-alert">
+          {error}
+        </p>
+      )}
       <div className="grid gap-3 sm:grid-cols-2">
         {cards.map((card) => {
           const isFrozen = frozen[card.id];
@@ -50,7 +74,8 @@ export function CardControls({ cards }: { cards: Card[] }) {
                   <div>
                     <p className="font-medium text-ink">{card.label}</p>
                     <p className="text-xs text-ink-subtle">
-                      ···· {card.last4} · expires {card.expiry}
+                      ···· {card.last4}
+                      {card.expiry !== "—" && ` · expires ${card.expiry}`}
                     </p>
                   </div>
                 </div>
@@ -59,14 +84,32 @@ export function CardControls({ cards }: { cards: Card[] }) {
                 </Badge>
               </div>
 
+              <dl className="mt-4 divide-y divide-border border-y border-border text-sm">
+                <Detail term="Card number">···· ···· ···· {card.last4}</Detail>
+                <Detail term="Type">
+                  {card.virtual === false ? "Physical" : "Virtual"}
+                </Detail>
+                {card.limit && (
+                  <Detail term="Per-transaction limit">
+                    <Amount value={card.limit} />
+                  </Detail>
+                )}
+                <Detail term="Status">{isFrozen ? "Frozen" : "Active"}</Detail>
+              </dl>
+
               <Button
                 variant={isFrozen ? "primary" : "secondary"}
                 size="sm"
                 className="mt-4 w-full"
                 onClick={() => toggle(card)}
+                disabled={pending === card.id}
               >
                 <Snowflake className="size-4" aria-hidden />
-                {isFrozen ? "Unfreeze card" : "Freeze card"}
+                {pending === card.id
+                  ? "Saving…"
+                  : isFrozen
+                    ? "Unfreeze card"
+                    : "Freeze card"}
               </Button>
 
               {isFrozen && (
@@ -80,5 +123,20 @@ export function CardControls({ cards }: { cards: Card[] }) {
         })}
       </div>
     </>
+  );
+}
+
+function Detail({
+  term,
+  children,
+}: {
+  term: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-baseline justify-between gap-3 py-2">
+      <dt className="text-ink-muted">{term}</dt>
+      <dd className="text-right font-medium tabular text-ink">{children}</dd>
+    </div>
   );
 }
