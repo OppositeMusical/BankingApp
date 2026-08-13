@@ -1,11 +1,12 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { CardControls } from "./card-controls";
+import { IssueCard } from "./issue-card";
 import { SessionList } from "./session-list";
 import { Explainer } from "@/components/banking/explainer";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { NoData } from "@/components/banking/no-data";
-import { cardsApi } from "@/lib/api";
+import { accountsApi, cardsApi } from "@/lib/api";
 import { showingSample } from "@/lib/api/sample";
 import { sessions } from "@/lib/mock/data";
 
@@ -18,7 +19,13 @@ export default async function SecurityPage() {
   const sample = showingSample();
   // /cards is served now, so cards are real in live mode. Sessions still have
   // no endpoint at all.
-  const cards = await cardsApi.list();
+  const [cards, accounts] = await Promise.all([
+    cardsApi.list(),
+    accountsApi.list(),
+  ]);
+  // Cards are issued against the container account, not a pot.
+  const cardAccountId =
+    accounts[0]?.parentAccountId ?? accounts[0]?.id ?? "";
 
   return (
     <>
@@ -38,6 +45,7 @@ export default async function SecurityPage() {
             No cards have been issued on this account.
           </NoData>
         )}
+        {!sample && cardAccountId && <IssueCard accountId={cardAccountId} />}
       </section>
 
       <section className="mb-6">

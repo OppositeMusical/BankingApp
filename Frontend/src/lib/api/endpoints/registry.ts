@@ -41,6 +41,7 @@ export const liveOperations = [
   "rules.delete",
   "rules.executions",
   "cards.list",
+  "cards.create",
   "cards.update",
   "cards.authorizations",
   "budgets.list",

@@ -20,6 +20,21 @@ const toCard = (wire: { id: string; last4: string; status: string }): Card => ({
 });
 
 export const cardsApi = {
+  issue: (accountId: string, subAccountId?: string): Promise<Card | undefined> =>
+    resolve("cards.create", {
+      scopedTo: accountId,
+      live: async () => {
+        const { card } = await apiFetch("/cards", {
+          method: "POST",
+          body: { accountId, subAccountId, type: "debit" },
+          schema: CardResponse,
+        });
+        return toCard(card);
+      },
+      fixture: () => undefined,
+      empty: () => undefined,
+    }),
+
   list: (): Promise<Card[]> =>
     resolve("cards.list", {
       live: async () => {
