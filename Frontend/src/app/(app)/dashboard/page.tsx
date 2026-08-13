@@ -23,6 +23,9 @@ export default async function DashboardPage() {
     cardsApi.list(),
   ]);
   const recent = await accountsApi.activity(accounts, 5);
+  const accountNames = Object.fromEntries(
+    accounts.map((account) => [account.id, account.name]),
+  );
 
   const depositAccounts = accounts.filter((a) => a.kind !== "credit");
   const totalBalance = sumMoney(
@@ -203,7 +206,7 @@ export default async function DashboardPage() {
               <ArrowRight className="size-3.5" aria-hidden />
             </Link>
           </div>
-          <CardControls cards={cards} />
+          <CardControls cards={cards} accountNames={accountNames} />
         </section>
       )}
 

@@ -107,6 +107,11 @@ export type Card = {
   virtual?: boolean;
   /** Per-transaction ceiling, when one is set. */
   limit?: Money;
+  /** debit or secured_credit. */
+  kind?: string;
+  /** The pot it spends from, when it is tied to one. */
+  subAccountId?: string;
+  issuedAt?: string;
 };
 
 export type Session = {

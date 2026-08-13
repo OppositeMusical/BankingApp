@@ -26,6 +26,9 @@ export default async function SecurityPage() {
   // Cards are issued against the container account, not a pot.
   const cardAccountId =
     accounts[0]?.parentAccountId ?? accounts[0]?.id ?? "";
+  const accountNames = Object.fromEntries(
+    accounts.map((account) => [account.id, account.name]),
+  );
 
   return (
     <>
@@ -39,7 +42,7 @@ export default async function SecurityPage() {
           Cards
         </h2>
         {cards.length > 0 ? (
-          <CardControls cards={cards} />
+          <CardControls cards={cards} accountNames={accountNames} />
         ) : (
           <NoData title="No cards yet">
             No cards have been issued on this account.

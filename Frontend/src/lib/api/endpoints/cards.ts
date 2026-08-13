@@ -29,6 +29,9 @@ const toCard = (wire: WireCard): Card => {
       typeof perTransaction === "number"
         ? { amount: perTransaction, currency: "USD" }
         : undefined,
+    kind: wire.type,
+    subAccountId: wire.subAccountId ?? undefined,
+    issuedAt: wire.createdAt,
   };
 };
 

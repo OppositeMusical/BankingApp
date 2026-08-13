@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card as Surface } from "@/components/ui/card";
 import { cardsApi, describeError } from "@/lib/api";
+import { formatFullDate } from "@/lib/format/date";
 import type { Card } from "@/lib/types/banking";
 
 /**
@@ -18,7 +19,14 @@ import type { Card } from "@/lib/types/banking";
  * If it fails the toggle goes back and says so, because a card that shows
  * "Frozen" while the network never heard about it is worse than no button.
  */
-export function CardControls({ cards }: { cards: Card[] }) {
+export function CardControls({
+  cards,
+  accountNames = {},
+}: {
+  cards: Card[];
+  /** sub-account id -> name, so a card can say which pot it spends from. */
+  accountNames?: Record<string, string>;
+}) {
   const [frozen, setFrozen] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(cards.map((card) => [card.id, card.status === "frozen"])),
   );
@@ -75,7 +83,7 @@ export function CardControls({ cards }: { cards: Card[] }) {
                     <p className="font-medium text-ink">{card.label}</p>
                     <p className="text-xs text-ink-subtle">
                       ···· {card.last4}
-                      {card.expiry !== "—" && ` · expires ${card.expiry}`}
+                      {card.kind === "secured_credit" && " · secured credit"}
                     </p>
                   </div>
                 </div>
@@ -85,17 +93,35 @@ export function CardControls({ cards }: { cards: Card[] }) {
               </div>
 
               <dl className="mt-4 divide-y divide-border border-y border-border text-sm">
-                <Detail term="Card number">···· ···· ···· {card.last4}</Detail>
+                {/* Last four only, and labelled as such. The system stores no
+                    full card number — `···· ···· ···· 1234` would imply one is
+                    being withheld, and a made-up 16 digits on a banking screen
+                    reads as a real credential. */}
+                <Detail term="Last four">···· {card.last4}</Detail>
                 <Detail term="Type">
-                  {card.virtual === false ? "Physical" : "Virtual"}
+                  {card.kind === "secured_credit" ? "Secured credit" : "Debit"}
+                  {card.virtual === false ? " · physical" : " · virtual"}
                 </Detail>
+                {card.subAccountId && accountNames[card.subAccountId] && (
+                  <Detail term="Spends from">
+                    {accountNames[card.subAccountId]}
+                  </Detail>
+                )}
                 {card.limit && (
                   <Detail term="Per-transaction limit">
                     <Amount value={card.limit} />
                   </Detail>
                 )}
+                {card.issuedAt && (
+                  <Detail term="Issued">{formatFullDate(card.issuedAt)}</Detail>
+                )}
                 <Detail term="Status">{isFrozen ? "Frozen" : "Active"}</Detail>
               </dl>
+
+              <p className="mt-2 text-xs text-ink-subtle">
+                Virtual cards here have no full number — the sandbox issues the
+                last four only.
+              </p>
 
               <Button
                 variant={isFrozen ? "primary" : "secondary"}
