@@ -42,6 +42,7 @@ const builderFixtures = () => ({
   sourceSuggestions: sample(sourceFixtures, []),
 });
 import { formatMoney } from "@/lib/format/money";
+import type { Account } from "@/lib/types/banking";
 import type { Flow, FlowSourceSuggestion, FlowSplit } from "@/lib/types/flows";
 import { cn } from "@/lib/utils/cn";
 
@@ -54,7 +55,7 @@ const stepLabels = [
   "Check it over",
 ] as const;
 
-export function FlowBuilder() {
+export function FlowBuilder({ accounts }: { accounts: Account[] }) {
   const [step, setStep] = useState<Step>(1);
   const [source, setSource] = useState<FlowSourceSuggestion | null>(null);
   const [flowName, setFlowName] = useState("");
@@ -120,10 +121,11 @@ export function FlowBuilder() {
         })}
       </ol>
 
-      {step === 1 && <StepSource onChoose={chooseSource} />}
+      {step === 1 && <StepSource onChoose={chooseSource} accounts={accounts} />}
 
       {step === 2 && source && (
         <StepSplits
+          accounts={accounts}
           source={source}
           flowName={flowName}
           onNameChange={setFlowName}
@@ -175,8 +177,10 @@ export function FlowBuilder() {
 
 function StepSource({
   onChoose,
+  accounts,
 }: {
   onChoose: (suggestion: FlowSourceSuggestion) => void;
+  accounts: Account[];
 }) {
   // Sorted by total received, not by date — the main income comes first.
   const sorted = useMemo(
@@ -196,7 +200,7 @@ function StepSource({
 
       <ul className="flex flex-col gap-3">
         {sorted.map((suggestion) => {
-          const arrivesIn = builderFixtures().accounts.find(
+          const arrivesIn = accounts.find(
             (a) => a.id === suggestion.arrivesInAccountId,
           );
           const claimed = suggestion.alreadyUsed;
@@ -285,7 +289,9 @@ function StepSplits({
   setView,
   onBack,
   onNext,
+  accounts,
 }: {
+  accounts: Account[];
   source: FlowSourceSuggestion;
   flowName: string;
   onNameChange: (name: string) => void;
@@ -355,6 +361,7 @@ function StepSplits({
           splits={splits}
           onChange={onSplitsChange}
           typicalAmount={source.typicalAmount}
+          accounts={accounts}
         />
       ) : (
         <>
@@ -364,6 +371,7 @@ function StepSplits({
             typicalAmount={source.typicalAmount}
             sourceName={source.displayName}
             sourceCadence={describeCadence(source.cadence)}
+            accounts={accounts}
           />
           {/* The accessible equivalent of the canvas, always present. */}
           <details className="mt-3">

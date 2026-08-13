@@ -1,7 +1,7 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { isWireId, resolve } from "./resolve";
 import * as config from "../config";
-import { pendingOperations } from "./registry";
+import type { Operation } from "./registry";
 
 /*
  * These pin the rule that a fixture id must never reach the wire.
@@ -63,11 +63,13 @@ describe("resolve", () => {
     expect(b.live).not.toHaveBeenCalled();
   });
 
-  // Read from the registry rather than named literally. Hardcoding one broke
-  // this test twice — once when rules.list shipped, once when brokerage did.
+  // The API now serves every operation the UI calls, so there is no real
+  // pending one left to name — and naming a served one is what broke this
+  // test twice before. A synthetic operation tests the branch itself, which
+  // is what matters: an unserved operation must never reach the network.
   it("uses fixtures for an unimplemented operation regardless of id", async () => {
     const b = branches();
-    const result = await resolve(pendingOperations[0], {
+    const result = await resolve("not.implemented" as Operation, {
       ...b,
       scopedTo: "30172bfa-6e88-4648-987d-3b942df3e6c5",
     });

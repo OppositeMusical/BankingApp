@@ -19,23 +19,17 @@ import { Plus } from "lucide-react";
 import { flowNodeTypes } from "./canvas-nodes";
 import { remainderPercentage, totalPercentage } from "@/lib/flows/split-deposit";
 import { sample } from "@/lib/api/sample";
-import {
-  accounts as accountFixtures,
-  goals as goalFixtures,
-} from "@/lib/mock/data";
+import { goals as goalFixtures } from "@/lib/mock/data";
 
-// Destination options are fixtures. Live mode offers none rather than
-// offering accounts that do not exist.
+// Accounts are real, passed down from the server. Goals stay on fixtures
+// because the contract has no goal resource at all — a SubAccount carries no
+// target amount or date (gap #2 in docs/api-contract.md) — so in live mode
+// there are simply no goal destinations to offer.
 //
 // Resolved at call time, not at module scope: module code runs at import,
-// before <ApiModeSync> has told the client what the server resolved, so a
-// module-level value would use the build-time mode and could disagree with
-// the server's markup.
-const destinationFixtures = () => ({
-  accounts: sample(accountFixtures, []),
-  goals: sample(goalFixtures, []),
-});
-import type { Money } from "@/lib/types/banking";
+// before <ApiModeSync> has told the client what the server resolved.
+const goalOptions = () => sample(goalFixtures, []);
+import type { Account, Money } from "@/lib/types/banking";
 import type { FlowDestination, FlowSplit } from "@/lib/types/flows";
 
 /*
@@ -133,6 +127,8 @@ type FlowCanvasProps = {
   sourceName: string;
   sourceCadence: string;
   readOnly?: boolean;
+  /** Real destinations, from the server. */
+  accounts?: Account[];
 };
 
 export function FlowCanvas(props: FlowCanvasProps) {
@@ -151,6 +147,7 @@ function FlowCanvasInner({
   sourceName,
   sourceCadence,
   readOnly = false,
+  accounts = [],
 }: FlowCanvasProps) {
   // Built once, from the splits as they were when the canvas mounted. The
   // canvas is unmounted when the user switches back to the list view, so the
@@ -346,11 +343,11 @@ function FlowCanvasInner({
 
   const availableDestinations = useMemo(() => {
     const options: { label: string; destination: FlowDestination }[] = [
-      ...destinationFixtures().accounts.map((account) => ({
+      ...accounts.map((account) => ({
         label: account.name,
         destination: { kind: "account" as const, accountId: account.id },
       })),
-      ...destinationFixtures().goals.map((goal) => ({
+      ...goalOptions().map((goal) => ({
         label: goal.name,
         destination: { kind: "goal" as const, goalId: goal.id },
       })),
@@ -358,7 +355,7 @@ function FlowCanvasInner({
     return options.filter(
       (option) => !usedKeys.has(destinationKey(option.destination)),
     );
-  }, [usedKeys]);
+  }, [usedKeys, accounts]);
 
   const used = totalPercentage(splits);
   const restPercent = remainderPercentage(splits);

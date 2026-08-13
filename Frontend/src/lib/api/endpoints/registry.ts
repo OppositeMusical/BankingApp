@@ -49,6 +49,8 @@ export const liveOperations = [
   "brokerage.account",
   "brokerage.orders",
   "brokerage.holdings",
+  "transfers.external",
+  "linkedAccounts.list",
 ] as const;
 
 export type LiveOperation = (typeof liveOperations)[number];
@@ -57,10 +59,14 @@ export type LiveOperation = (typeof liveOperations)[number];
  * Everything in the contract that Go has not implemented. Listed explicitly so
  * the gap is visible in code review rather than inferred from an absence.
  */
-export const pendingOperations = [
-  "transfers.external",
-  "linkedAccounts.list",
-] as const;
+/**
+ * Nothing is pending: the Go API now serves every operation the UI calls.
+ *
+ * Kept as an empty tuple rather than deleted — `resolve()` and its tests are
+ * written around the distinction, and the next unimplemented endpoint has a
+ * place to go.
+ */
+export const pendingOperations = [] as const;
 
 export type PendingOperation = (typeof pendingOperations)[number];
 

@@ -1,10 +1,15 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { FlowBuilder } from "./flow-builder";
+import { accountsApi } from "@/lib/api";
 
 export const metadata = { title: "New flow" };
 
-export default function NewFlowPage() {
+export default async function NewFlowPage() {
+  // Real destinations. The builder used fixtures, which meant it offered
+  // nothing at all in live mode.
+  const accounts = await accountsApi.list();
+
   return (
     <>
       <Link
@@ -17,7 +22,7 @@ export default function NewFlowPage() {
       <h1 className="mb-6 font-display text-3xl font-semibold tracking-tight text-ink">
         Build a flow
       </h1>
-      <FlowBuilder />
+      <FlowBuilder accounts={accounts} />
     </>
   );
 }
