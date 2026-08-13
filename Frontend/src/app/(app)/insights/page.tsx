@@ -6,28 +6,46 @@ import { Amount } from "@/components/banking/amount";
 import { StatTile } from "@/components/banking/stat-tile";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { NoData } from "@/components/banking/no-data";
+import { accountsApi, budgetsApi } from "@/lib/api";
 import { showingSample } from "@/lib/api/sample";
 import { feeSummary, monthlyTrend, spendingByCategory } from "@/lib/mock/data";
 import { sumMoney } from "@/lib/format/money";
 
 export const metadata = { title: "Insights" };
 
-export default function InsightsPage() {
+export default async function InsightsPage() {
   // Every figure here comes from fixtures — spending slices, the six-month
   // trend, the fee comparison. None of it has an endpoint, so in live mode
   // there is nothing to compute from and nothing honest to show.
   if (!showingSample()) {
+    // Budgets are served now, so category spend is real. The six-month trend
+    // and the fee comparison still have no endpoint, so they stay out rather
+    // than being invented.
+    const accounts = await accountsApi.list();
+    const parent = accounts[0]?.parentAccountId ?? accounts[0]?.id;
+    const slices = parent ? await budgetsApi.spending(parent) : [];
+
     return (
       <>
         <PageHeader
           title="Insights"
           description="Where your money went, in plain numbers."
         />
-        <NoData title="No spending data yet">
-          Insights are built from categorised transactions, spending totals and
-          a fee comparison — none of which the banking service publishes yet.
-          Switch to sample data to see the finished screen.
-        </NoData>
+        {slices.length > 0 ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Spending by category</CardTitle>
+            </CardHeader>
+            <CardBody>
+              <CategoryBars data={slices} />
+            </CardBody>
+          </Card>
+        ) : (
+          <NoData title="No spending data yet">
+            Category spend comes from your budgets. Set one, spend against it,
+            and it shows up here.
+          </NoData>
+        )}
       </>
     );
   }

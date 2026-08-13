@@ -5,6 +5,7 @@ import {
   Sparkles,
   Split,
   Target,
+  TrendingUp,
   Wallet,
 } from "lucide-react";
 
@@ -14,6 +15,7 @@ export const navItems = [
   { href: "/transactions", label: "Activity", icon: Sparkles },
   { href: "/flows", label: "Flows", icon: Split },
   { href: "/goals", label: "Goals", icon: Target },
+  { href: "/invest", label: "Invest", icon: TrendingUp },
   { href: "/insights", label: "Insights", icon: ChartPie },
   { href: "/security", label: "Security", icon: ShieldCheck },
 ] as const;

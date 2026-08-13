@@ -45,6 +45,9 @@ export const liveOperations = [
   "cards.authorizations",
   "budgets.list",
   "budgets.upsert",
+  "brokerage.account",
+  "brokerage.orders",
+  "brokerage.holdings",
 ] as const;
 
 export type LiveOperation = (typeof liveOperations)[number];
@@ -56,9 +59,6 @@ export type LiveOperation = (typeof liveOperations)[number];
 export const pendingOperations = [
   "transfers.external",
   "linkedAccounts.list",
-  "brokerage.account",
-  "brokerage.orders",
-  "brokerage.holdings",
 ] as const;
 
 export type PendingOperation = (typeof pendingOperations)[number];

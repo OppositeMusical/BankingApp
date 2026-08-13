@@ -5,16 +5,20 @@ import { Explainer } from "@/components/banking/explainer";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { NoData } from "@/components/banking/no-data";
+import { cardsApi } from "@/lib/api";
 import { showingSample } from "@/lib/api/sample";
-import { cards, sessions } from "@/lib/mock/data";
+import { sessions } from "@/lib/mock/data";
 
 export const metadata = { title: "Security" };
 
-export default function SecurityPage() {
+export default async function SecurityPage() {
   // /cards is unimplemented and sessions have no endpoint at all, so in live
   // mode both lists would be invented. The trusted-contact panel below is
   // static copy and stays either way.
   const sample = showingSample();
+  // /cards is served now, so cards are real in live mode. Sessions still have
+  // no endpoint at all.
+  const cards = await cardsApi.list();
 
   return (
     <>
@@ -27,11 +31,11 @@ export default function SecurityPage() {
         <h2 className="mb-3 font-display text-xl font-semibold text-ink">
           Cards
         </h2>
-        {sample ? (
+        {cards.length > 0 ? (
           <CardControls cards={cards} />
         ) : (
           <NoData title="No cards yet">
-            Card issuing isn&apos;t connected to the banking service yet.
+            No cards have been issued on this account.
           </NoData>
         )}
       </section>
