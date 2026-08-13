@@ -2,18 +2,17 @@ import Link from "next/link";
 import { ArrowRight, ArrowLeftRight, Snowflake } from "lucide-react";
 import { Amount } from "@/components/banking/amount";
 import { AccountCard } from "@/components/banking/account-card";
-import { GoalCard } from "@/components/banking/goal-card";
 import { StatTile } from "@/components/banking/stat-tile";
 import { TransactionRow } from "@/components/banking/transaction-row";
 import { Explainer } from "@/components/banking/explainer";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { accountsApi, authApi, cardsApi } from "@/lib/api";
-// Goals, fees, and the monthly trend have no wire representation yet
+// Fees and the monthly trend have no wire representation yet
 // (docs/api-contract.md §6), so they still come from fixtures.
 import { CardControls } from "../security/card-controls";
 import { showingSample } from "@/lib/api/sample";
-import { feeSummary, goals, monthlyTrend } from "@/lib/mock/data";
+import { feeSummary, monthlyTrend } from "@/lib/mock/data";
 import { sumMoney } from "@/lib/format/money";
 
 export default async function DashboardPage() {
@@ -37,10 +36,6 @@ export default async function DashboardPage() {
   // hidden entirely in live mode rather than shown with invented figures.
   const sample = showingSample();
   const thisMonth = monthlyTrend[monthlyTrend.length - 1];
-  const savedThisMonth = sumMoney(
-    goals.map((g) => g.monthlyContribution ?? { amount: 0, currency: "USD" }),
-    "USD",
-  );
 
   return (
     <>
@@ -164,28 +159,6 @@ export default async function DashboardPage() {
           ))}
         </div>
       </section>
-
-      {/* Goals — fixture-derived; goals cannot round-trip through the wire */}
-      {sample && (
-      <section aria-labelledby="goals-heading" className="mb-8">
-        <div className="mb-3 flex items-center justify-between">
-          <h2
-            id="goals-heading"
-            className="font-display text-xl font-semibold text-ink"
-          >
-            Goals
-          </h2>
-          <p className="text-sm text-ink-muted">
-            <Amount value={savedThisMonth} compactWhole /> put aside each month
-          </p>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {goals.slice(0, 2).map((goal) => (
-            <GoalCard key={goal.id} goal={goal} />
-          ))}
-        </div>
-      </section>
-      )}
 
       {/* Cards — real in live mode; the same component Security uses, so
           freezing behaves identically in both places. */}

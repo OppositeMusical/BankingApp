@@ -18,17 +18,10 @@ import "@xyflow/react/dist/style.css";
 import { Plus } from "lucide-react";
 import { flowNodeTypes } from "./canvas-nodes";
 import { remainderPercentage, totalPercentage } from "@/lib/flows/split-deposit";
-import { sample } from "@/lib/api/sample";
-import { goals as goalFixtures } from "@/lib/mock/data";
 
-// Accounts are real, passed down from the server. Goals stay on fixtures
-// because the contract has no goal resource at all — a SubAccount carries no
-// target amount or date (gap #2 in docs/api-contract.md) — so in live mode
-// there are simply no goal destinations to offer.
-//
-// Resolved at call time, not at module scope: module code runs at import,
-// before <ApiModeSync> has told the client what the server resolved.
-const goalOptions = () => sample(goalFixtures, []);
+// Accounts are real, passed down from the server. Goals were removed as a
+// concept: the contract never had a goal resource — a SubAccount carries no
+// target amount or date — so a goal destination could never round-trip.
 import type { Account, Money } from "@/lib/types/banking";
 import type { FlowDestination, FlowSplit } from "@/lib/types/flows";
 
@@ -346,10 +339,6 @@ function FlowCanvasInner({
       ...accounts.map((account) => ({
         label: account.name,
         destination: { kind: "account" as const, accountId: account.id },
-      })),
-      ...goalOptions().map((goal) => ({
-        label: goal.name,
-        destination: { kind: "goal" as const, goalId: goal.id },
       })),
     ];
     return options.filter(
