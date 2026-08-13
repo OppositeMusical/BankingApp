@@ -138,3 +138,68 @@ export async function fetchQuotes(
   );
   return settled.filter((quote): quote is Quote => quote !== null);
 }
+
+
+/*
+ * Symbol search across every listed instrument.
+ *
+ * The static catalogue in symbols.ts is a starting watchlist, not the tradable
+ * universe — this is. Yahoo's search endpoint is keyless and covers global
+ * equities, ETFs and funds.
+ */
+export type SearchHit = {
+  symbol: string;
+  name: string;
+  exchange: string;
+  type: string;
+};
+
+type YahooSearch = {
+  quotes?: Array<{
+    symbol?: string;
+    shortname?: string;
+    longname?: string;
+    exchange?: string;
+    quoteType?: string;
+    isYahooFinance?: boolean;
+  }>;
+};
+
+export async function searchMarket(
+  query: string,
+  limit = 8,
+): Promise<SearchHit[]> {
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  const url =
+    "https://query2.finance.yahoo.com/v1/finance/search" +
+    `?q=${encodeURIComponent(trimmed)}&quotesCount=${limit * 3}&newsCount=0`;
+
+  try {
+    const response = await fetch(url, {
+      headers: { "User-Agent": "Mozilla/5.0" },
+      next: { revalidate: 300 },
+    });
+    if (!response.ok) return [];
+
+    const payload = (await response.json()) as YahooSearch;
+    return (payload.quotes ?? [])
+      .filter(
+        (hit) =>
+          hit.symbol &&
+          hit.isYahooFinance !== false &&
+          // Currencies, indices and futures are not things this app can buy.
+          ["EQUITY", "ETF", "MUTUALFUND"].includes(hit.quoteType ?? ""),
+      )
+      .slice(0, limit)
+      .map((hit) => ({
+        symbol: hit.symbol!,
+        name: hit.shortname ?? hit.longname ?? hit.symbol!,
+        exchange: hit.exchange ?? "",
+        type: hit.quoteType ?? "",
+      }));
+  } catch {
+    return [];
+  }
+}

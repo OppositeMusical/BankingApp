@@ -195,7 +195,7 @@ export function TradeDesk({
                 value={symbol}
                 onChange={(event) => setSymbol(event.target.value.toUpperCase())}
                 list="symbol-options"
-                placeholder="Search VOO, Apple…"
+                placeholder="Any ticker"
                 maxLength={10}
                 autoComplete="off"
                 className="h-11 w-52 rounded-field border border-border-strong bg-surface px-3 text-sm uppercase text-ink"

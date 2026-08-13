@@ -5,7 +5,6 @@ import { Search, TrendingDown, TrendingUp } from "lucide-react";
 import { PriceChart } from "@/components/charts/price-chart";
 import { Sparkline } from "@/components/charts/sparkline";
 import { Card, CardBody } from "@/components/ui/card";
-import { searchSymbols } from "@/lib/market/symbols";
 import type { Quote, Range } from "@/lib/market/quotes";
 import { cn } from "@/lib/utils/cn";
 
@@ -54,15 +53,12 @@ export function MarketPanel({
 
     const run = ++listRun.current;
     const timer = setTimeout(async () => {
-      // Match the local catalogue first, then fall back to treating the input
-      // as a ticker — so a symbol not on the list is still reachable.
-      const matches = searchSymbols(trimmed, 8).map((entry) => entry.symbol);
-      const symbols = matches.length > 0 ? matches : [trimmed.toUpperCase()];
-
       setLoading(true);
       try {
+        // Searches every listed equity, ETF and fund — not the local
+        // catalogue, which is only the default watchlist.
         const response = await fetch(
-          `/api/market?symbols=${symbols.join(",")}&range=1mo`,
+          `/api/market?q=${encodeURIComponent(trimmed)}&range=1mo`,
         );
         const data = (await response.json()) as { quotes: Quote[] };
         if (run === listRun.current) setResults(data.quotes);
@@ -171,7 +167,7 @@ export function MarketPanel({
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search a ticker or company"
+              placeholder="Search any stock, ETF or fund"
               aria-label="Search stocks"
               className="h-10 w-64 rounded-field border border-border-strong bg-surface pl-9 pr-3 text-sm text-ink"
             />
