@@ -184,7 +184,7 @@ export default async function DashboardPage() {
               <ArrowRight className="size-3.5" aria-hidden />
             </Link>
           </div>
-          <CardControls cards={cards} accountNames={accountNames} />
+          <CardControls cards={cards} accountNames={accountNames} compact />
         </section>
       )}
 

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { CreditCard, Snowflake } from "lucide-react";
+import { Snowflake } from "lucide-react";
 import { Amount } from "@/components/banking/amount";
-import { Badge } from "@/components/ui/badge";
+import { CardFace } from "@/components/banking/card-face";
 import { Button } from "@/components/ui/button";
 import { Card as Surface } from "@/components/ui/card";
 import { cardsApi, describeError } from "@/lib/api";
@@ -22,10 +22,16 @@ import type { Card } from "@/lib/types/banking";
 export function CardControls({
   cards,
   accountNames = {},
+  compact = false,
 }: {
   cards: Card[];
-  /** sub-account id -> name, so a card can say which pot it spends from. */
+  /** sub-account id -> name, so a card can say which account it draws on. */
   accountNames?: Record<string, string>;
+  /**
+   * Home shows the card and the one action worth having there. The full
+   * breakdown belongs on Security, where someone went looking for it.
+   */
+  compact?: boolean;
 }) {
   const [frozen, setFrozen] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(cards.map((card) => [card.id, card.status === "frozen"])),
@@ -71,27 +77,15 @@ export function CardControls({
           const isFrozen = frozen[card.id];
           return (
             <Surface key={card.id} className="p-5">
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-center gap-3">
-                  <span
-                    className="grid size-9 place-items-center rounded-pill bg-surface-sunk text-ink-muted"
-                    aria-hidden
-                  >
-                    <CreditCard className="size-[18px]" />
-                  </span>
-                  <div>
-                    <p className="font-medium text-ink">{card.label}</p>
-                    <p className="text-xs text-ink-subtle">
-                      ···· {card.last4}
-                      {card.kind === "secured_credit" && " · secured credit"}
-                    </p>
-                  </div>
-                </div>
-                <Badge tone={isFrozen ? "accent" : "positive"}>
-                  {isFrozen ? "Frozen" : "Active"}
-                </Badge>
-              </div>
+              <CardFace
+                card={card}
+                frozen={isFrozen}
+                spendsFrom={
+                  card.subAccountId ? accountNames[card.subAccountId] : undefined
+                }
+              />
 
+              {!compact && (
               <dl className="mt-4 divide-y divide-border border-y border-border text-sm">
                 {/* Last four only, and labelled as such. The system stores no
                     full card number — `···· ···· ···· 1234` would imply one is
@@ -117,11 +111,14 @@ export function CardControls({
                 )}
                 <Detail term="Status">{isFrozen ? "Frozen" : "Active"}</Detail>
               </dl>
+              )}
 
-              <p className="mt-2 text-xs text-ink-subtle">
-                Virtual cards here have no full number — the sandbox issues the
-                last four only.
-              </p>
+              {!compact && (
+                <p className="mt-2 text-xs text-ink-subtle">
+                  Virtual cards here have no full number — the sandbox issues
+                  the last four only.
+                </p>
+              )}
 
               <Button
                 variant={isFrozen ? "primary" : "secondary"}
