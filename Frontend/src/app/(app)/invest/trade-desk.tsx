@@ -20,6 +20,16 @@ import type { Quote } from "@/lib/market/quotes";
 import type { Money } from "@/lib/types/banking";
 import { cn } from "@/lib/utils/cn";
 
+/**
+ * Statuses that mean "accepted, not yet filled".
+ *
+ * With a real broker an order is submitted and filled separately: outside
+ * market hours it simply queues, and the reconcile worker writes the fill in
+ * later. The simulated path filled instantly, which is why nothing here used
+ * to account for it.
+ */
+const pendingStatuses = new Set(["pending", "submitted", "partially_filled"]);
+
 /** Re-fetch the server component's data on this cadence. */
 const REFRESH_MS = 15_000;
 
@@ -286,7 +296,8 @@ export function TradeDesk({
           {positions.length === 0 ? (
             <CardBody className="pt-5">
               <p className="text-sm text-ink-muted">
-                Nothing held yet. A buy shows up here straight away.
+                Nothing held yet. A position appears once an order fills —
+                which is not always immediate, see below.
               </p>
             </CardBody>
           ) : (
@@ -337,8 +348,7 @@ export function TradeDesk({
         </Card>
 
         <p className="mt-2 text-xs text-ink-subtle">
-          Prices come from the last fill. The sandbox quotes a fixed price per
-          symbol, so positions stay flat until the broker feed is real.
+          Valued at your last fill price, not a live quote.
         </p>
       </section>
 
@@ -374,11 +384,14 @@ export function TradeDesk({
                   </div>
                   <p className="mt-0.5 text-xs text-ink-subtle">
                     {formatFullDate(order.createdAt)}
-                    {order.filledAvgPrice && (
+                    {order.filledAvgPrice ? (
                       <>
                         {" · filled at "}
                         <Amount value={order.filledAvgPrice} />
                       </>
+                    ) : (
+                      pendingStatuses.has(order.status) &&
+                      " · waiting for the market — it fills when trading opens"
                     )}
                   </p>
                   {order.failureReason && (
