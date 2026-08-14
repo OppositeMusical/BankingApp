@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowRight, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ArrowRight,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Landmark,
+  PiggyBank,
+} from "lucide-react";
 import { Amount } from "@/components/banking/amount";
 import { kindLabels, VisibilityBadge } from "@/components/banking/account-card";
 import type { Account, AccountShare } from "@/lib/types/banking";
@@ -207,7 +214,34 @@ function CarouselAccountCard({ account }: { account: Account }) {
     account.available.amount !== account.balance.amount;
 
   return (
-    <article className="rounded-card border border-border bg-surface p-5 shadow-card">
+    <article
+      className={cn(
+        "rounded-card border bg-surface p-5 shadow-card",
+        // The bank account carries the accent edge; sub-accounts sit quieter
+        // beneath it, which is the actual hierarchy.
+        account.isBankAccount
+          ? "border-accent/40 ring-1 ring-accent/10"
+          : "border-border",
+      )}
+    >
+      <div className="mb-3 flex items-center gap-2">
+        {account.isBankAccount ? (
+          <>
+            <Landmark className="size-4 shrink-0 text-accent" aria-hidden />
+            <span className="text-xs font-medium tracking-wide text-accent uppercase">
+              Bank account
+            </span>
+          </>
+        ) : (
+          <>
+            <PiggyBank className="size-4 shrink-0 text-ink-subtle" aria-hidden />
+            <span className="text-xs font-medium tracking-wide text-ink-subtle uppercase">
+              Set aside{account.parentName && ` from ${account.parentName}`}
+            </span>
+          </>
+        )}
+      </div>
+
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="font-medium text-ink">
@@ -271,8 +305,17 @@ function CarouselAccountCard({ account }: { account: Account }) {
               actually finished — an account exists before its numbers do, and
               a blank field would read as a missing value rather than a
               pending one. */}
-          {account.bank?.status === "provisioned" &&
-          account.bank.accountNumber ? (
+          {!account.isBankAccount ? (
+            /* A sub-account has no account number. Showing the parent's here
+               would read as its own, which is the whole confusion this card
+               is trying to avoid. */
+            <Detail term="Account number">
+              <span className="text-ink-muted">
+                Uses {account.parentName ?? "the bank account"}&apos;s
+              </span>
+            </Detail>
+          ) : account.bank?.status === "provisioned" &&
+            account.bank.accountNumber ? (
             <>
               <Detail term="Account number">
                 <AccountNumber value={account.bank.accountNumber} />

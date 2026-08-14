@@ -149,9 +149,11 @@ export function toAccount(
     /** The container the sub-account was fetched from. The wire shape does not
      * carry it, so the caller that knows the parent passes it down. */
     parentAccountId?: string;
-    /** The container's bank details. A pot has no bank account of its own —
-     *  money reaches it through the parent's account and routing numbers. */
+    /** The container's bank details. A sub-account has no bank account of its
+     *  own — money reaches it through the parent's numbers. */
     bank?: Account["bank"];
+    /** The container's name, so a sub-account can say what it divides. */
+    parentName?: string;
   } = {},
 ): Account {
   const shares = (options.members ?? [])
@@ -176,6 +178,7 @@ export function toAccount(
     visibility: deriveVisibility(shares),
     sharedWith: shares,
     isBankAccount: false,
+    parentName: options.parentName,
     bank: options.bank,
     // No interest rate exists on the wire; omitted rather than invented, so
     // the UI simply doesn't render the line.

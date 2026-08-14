@@ -46,6 +46,8 @@ export type Account = {
    * double-count; ignoring the parent undercounts by the unallocated amount.
    */
   isBankAccount?: boolean;
+  /** For a sub-account: the name of the bank account it divides. */
+  parentName?: string;
   /** Real bank details. Only the bank account has them; sub-accounts share it. */
   bank?: BankDetails;
   interestRateBps?: number;

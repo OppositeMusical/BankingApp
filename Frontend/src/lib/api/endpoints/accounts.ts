@@ -99,6 +99,7 @@ export const accountsApi = {
                   members: members.members,
                   parentAccountId: account.id,
                   bank: bankAccount.bank,
+                  parentName: bankAccount.name,
                 }),
               ),
             ];
