@@ -81,7 +81,11 @@ export function CardControls({
                 card={card}
                 frozen={isFrozen}
                 spendsFrom={
-                  card.subAccountId ? accountNames[card.subAccountId] : undefined
+                  // A card tied to a sub-account draws on that; one without
+                  // draws on the bank account itself, which is in the same map.
+                  (card.subAccountId
+                    ? accountNames[card.subAccountId]
+                    : undefined) ?? accountNames[card.accountId]
                 }
               />
 
