@@ -266,7 +266,28 @@ function CarouselAccountCard({ account }: { account: Account }) {
             <Amount value={account.available} />
           </Detail>
           <Detail term="Account type">{kindLabels[account.kind]}</Detail>
-          <Detail term="Account number">···· {account.last4}</Detail>
+
+          {/* Real numbers from the bank. Shown only once provisioning has
+              actually finished — an account exists before its numbers do, and
+              a blank field would read as a missing value rather than a
+              pending one. */}
+          {account.bank?.status === "provisioned" &&
+          account.bank.accountNumber ? (
+            <>
+              <Detail term="Account number">
+                <AccountNumber value={account.bank.accountNumber} />
+              </Detail>
+              {account.bank.routingNumber && (
+                <Detail term="Routing number">
+                  {account.bank.routingNumber}
+                </Detail>
+              )}
+            </>
+          ) : (
+            <Detail term="Account number">
+              <BankStatus bank={account.bank} fallback={account.last4} />
+            </Detail>
+          )}
           {hasInterest && (
             <Detail term="Interest">
               {(account.interestRateBps! / 100).toFixed(2)}% a year
@@ -314,6 +335,51 @@ function CarouselAccountCard({ account }: { account: Account }) {
       </div>
     </article>
   );
+}
+
+/**
+ * An account number, masked until asked for.
+ *
+ * The routing number beside it is public — every bank publishes theirs — but
+ * the pair is what authorises a debit, so the account number is the half worth
+ * a deliberate action to reveal.
+ */
+function AccountNumber({ value }: { value: string }) {
+  const [shown, setShown] = useState(false);
+  return (
+    <span className="inline-flex items-center gap-2">
+      <span className="tabular">
+        {shown ? value : `···· ${value.slice(-4)}`}
+      </span>
+      <button
+        type="button"
+        onClick={() => setShown((current) => !current)}
+        className="rounded-field text-xs font-medium text-accent hover:underline"
+      >
+        {shown ? "Hide" : "Show"}
+        <span className="sr-only"> full account number</span>
+      </button>
+    </span>
+  );
+}
+
+/** What to say while there is no account number yet. */
+function BankStatus({
+  bank,
+  fallback,
+}: {
+  bank?: Account["bank"];
+  fallback: string;
+}) {
+  if (!bank) return <>···· {fallback}</>;
+  if (bank.status === "failed") {
+    return (
+      <span className="text-alert">
+        {bank.failureReason ?? "The bank declined this account"}
+      </span>
+    );
+  }
+  return <span className="text-ink-muted">Opening at the bank…</span>;
 }
 
 function Detail({

@@ -37,7 +37,22 @@ export type Account = {
   visibility: AccountVisibility;
   /** People other than the owner who can see this account. */
   sharedWith: AccountShare[];
+  /** Real bank details. Lives on the container, so pots inherit the parent's. */
+  bank?: BankDetails;
   interestRateBps?: number;
+};
+
+/**
+ * The real bank account behind a UI account.
+ *
+ * Provisioned asynchronously at registration, so an account exists before its
+ * numbers do — `status` is what says which.
+ */
+export type BankDetails = {
+  status: "unprovisioned" | "provisioned" | "failed" | string;
+  accountNumber?: string;
+  routingNumber?: string;
+  failureReason?: string;
 };
 
 export type AccountShare = {

@@ -85,10 +85,15 @@ export const accountsApi = {
               return [toAccountFromContainer(account)];
             }
 
+            // Pots inherit the container's bank details: an inbound wire
+            // reaches a pot through the parent's account number, not one of
+            // its own.
+            const container = toAccountFromContainer(account);
             return subAccounts.subAccounts.map((subAccount) =>
               toAccount(subAccount, {
                 members: members.members,
                 parentAccountId: account.id,
+                bank: container.bank,
               }),
             );
           }),

@@ -30,6 +30,14 @@ export const UserSchema = z.object({
 });
 export type WireUser = z.infer<typeof UserSchema>;
 
+/** The real bank account behind ours, provisioned at Column. */
+export const BankSchema = z.object({
+  status: z.string(),
+  accountNumber: z.string().nullable().optional(),
+  routingNumber: z.string().nullable().optional(),
+  failureReason: z.string().nullable().optional(),
+});
+
 export const AccountSchema = z.object({
   id: z.string(),
   type: z.enum(["personal", "business"]),
@@ -39,6 +47,7 @@ export const AccountSchema = z.object({
   available: MoneySchema,
   held: MoneySchema,
   createdAt: z.string(),
+  bank: BankSchema.optional(),
 });
 export type WireAccount = z.infer<typeof AccountSchema>;
 

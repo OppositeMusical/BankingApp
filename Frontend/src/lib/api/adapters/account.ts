@@ -108,17 +108,35 @@ export function toHolder(
  * container. It reads as a placeholder, which is exactly what it is.
  */
 export function toAccountFromContainer(account: WireAccount): Account {
+  const bank = toBankDetails(account);
   return {
     id: account.id,
     // It IS the container, so there is no parent to point at.
     parentAccountId: undefined,
     name: account.type === "business" ? "Business account" : "Personal account",
     kind: "checking",
-    last4: account.id.replace(/\D/g, "").slice(-4).padStart(4, "0"),
+    // The real account number's last four once the bank has provisioned one.
+    // Falling back to the uuid is a placeholder for the seconds before that.
+    last4: lastFour(bank?.accountNumber ?? account.id),
     balance: toMoney(account.balance),
     available: toMoney(account.available),
     visibility: "sole",
     sharedWith: [],
+    bank,
+  };
+}
+
+/** Digits only, so a uuid fallback cannot produce letters. */
+const lastFour = (value: string) =>
+  value.replace(/\D/g, "").slice(-4).padStart(4, "0");
+
+function toBankDetails(account: WireAccount): Account["bank"] {
+  if (!account.bank) return undefined;
+  return {
+    status: account.bank.status,
+    accountNumber: account.bank.accountNumber ?? undefined,
+    routingNumber: account.bank.routingNumber ?? undefined,
+    failureReason: account.bank.failureReason ?? undefined,
   };
 }
 
@@ -130,6 +148,9 @@ export function toAccount(
     /** The container the sub-account was fetched from. The wire shape does not
      * carry it, so the caller that knows the parent passes it down. */
     parentAccountId?: string;
+    /** The container's bank details. A pot has no bank account of its own —
+     *  money reaches it through the parent's account and routing numbers. */
+    bank?: Account["bank"];
   } = {},
 ): Account {
   const shares = (options.members ?? [])
@@ -153,6 +174,7 @@ export function toAccount(
       : { amount: 0, currency: "USD" },
     visibility: deriveVisibility(shares),
     sharedWith: shares,
+    bank: options.bank,
     // No interest rate exists on the wire; omitted rather than invented, so
     // the UI simply doesn't render the line.
   };
