@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Caveat, Fraunces, Inter } from "next/font/google";
+import { Press_Start_2P, Silkscreen, VT323, Teko } from "next/font/google";
 import "./globals.css";
 // Side effect only: registers the cookie-backed auth token source so server
 // components can make authenticated connector calls in live mode.
@@ -8,27 +8,33 @@ import { apiMode } from "@/lib/api/config";
 import { ApiModeSync } from "@/lib/api/mode-sync";
 import { UIPreferencesProvider } from "@/lib/store/ui-preferences";
 
-const inter = Inter({
-  variable: "--font-inter",
+// Terminal font for body text
+const vt323 = VT323({
+  weight: "400",
+  variable: "--font-vt323",
   subsets: ["latin"],
   display: "swap",
 });
 
-// Editorial display face, used for balances and page headings.
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+// Authentic 8-bit pixel display font for balances, headings & arcade scoreboards
+const silkscreen = Silkscreen({
+  weight: ["400", "700"],
+  variable: "--font-silkscreen",
   subsets: ["latin"],
   display: "swap",
-  axes: ["SOFT", "WONK", "opsz"],
 });
 
-/*
- * Handwritten face for the Flows scrapbook. Used ONLY for a Flow's name — never
- * for an amount. A figure that looks hand-drawn looks uncertain, which is the
- * opposite of what a balance should feel like. See docs/flow-budgets.md §9.
- */
-const caveat = Caveat({
-  variable: "--font-caveat",
+// Impactful retro-tech font for numbers
+const teko = Teko({
+  variable: "--font-teko",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+// Iconic arcade cabinet pixel font for badges, flows, and arcade accents
+const pressStart2P = Press_Start_2P({
+  weight: "400",
+  variable: "--font-press-start",
   subsets: ["latin"],
   display: "swap",
 });
@@ -73,7 +79,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${inter.variable} ${fraunces.variable} ${caveat.variable} h-full`}
+      className={`${vt323.variable} ${silkscreen.variable} ${teko.variable} ${pressStart2P.variable} h-full`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

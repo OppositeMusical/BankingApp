@@ -53,7 +53,7 @@ export function SourceNode({ data }: NodeProps) {
         {displayName}
       </p>
       <p className="mt-1 text-xs text-ink-subtle">{cadence}</p>
-      <p className="mt-2 font-display text-lg font-semibold text-ink">
+      <p className="mt-2 font-numbers text-lg font-semibold text-ink">
         <Amount value={typicalAmount} compactWhole />
       </p>
       <Handle
@@ -181,7 +181,7 @@ export function RestNode({ data }: NodeProps) {
       <p className="mt-0.5 text-xs text-ink-subtle">Gets whatever&apos;s left</p>
 
       {/* Derived: no slider, no input. It moves as the others move. */}
-      <p className="mt-3 font-display text-2xl font-semibold tabular text-ink">
+      <p className="mt-3 font-numbers text-2xl font-semibold tabular text-ink">
         {percentage}%
       </p>
       <p className="mt-0.5 text-xs text-ink-muted">

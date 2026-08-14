@@ -9,101 +9,102 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ---------------------------------------------------------------------------
- * Light theme (default)
+ * Arcade theme (default) — "arcade floor lighting"
+ * Black-and-gold palette inspired by classic arcade cabinets and coin-ops.
  * Every foreground/background pairing below is verified at >= 4.5:1 for text
  * and >= 3:1 for UI boundaries and focus indicators (WCAG 2.2 AA).
+ * See docs/branding-identity-v2.md for the full spec.
  * ------------------------------------------------------------------------- */
 :root {
-  --bg: #fbf8f5; /* warm cream page background */
-  --surface: #ffffff; /* raised cards */
-  --surface-sunk: #f3eee9; /* wells, inset rows */
+  --bg: #0a0a0a; /* cabinet black */
+  --surface: #141414; /* screen bezel — raised cards */
+  --surface-sunk: #0d0d0d; /* coin slot shadow — wells, inset rows */
 
-  --ink: #1c1917; /* 16.5:1 on bg  */
-  --ink-muted: #57534e; /*  7.2:1 on bg  */
-  --ink-subtle: #6b6560; /*  5.4:1 on bg  */
+  --ink: #f0e6d3; /* ~16:1 on bg — warm white with gold cast */
+  --ink-muted: #a89a84; /*  ~7.5:1 on bg — faded gold */
+  --ink-subtle: #7a7060; /*  ~5:1 on bg — dimmed marquee */
 
-  --border: #e7e0d8; /* decorative separation */
-  --border-strong: #988c7f; /*  3.1:1 on bg — form control boundaries */
+  --border: #2a2520; /* dark bronze edge */
+  --border-strong: #5c5040; /* ~3:1 on bg — visible bronze line */
 
-  --accent: #6b4e7a; /* deep plum — 6.6:1 on bg */
-  --accent-hover: #573f63;
-  --accent-soft: #f0e8f4; /* chips, active nav, subtle fills */
-  --accent-on: #ffffff; /* text on a filled plum surface — 7.0:1 */
+  --accent: #d4a843; /* coin gold */
+  --accent-hover: #e0b84f; /* brighter gold — coin catching the light */
+  --accent-soft: #1f1a10; /* dim glow behind glass */
+  --accent-on: #0a0a0a; /* black text on gold surfaces */
 
-  --positive: #2f6b4f; /* money in */
-  --negative: #a14a38; /* money out — muted terracotta, not alarm red */
-  --alert: #b3261e; /* reserved for genuine alerts only */
+  --positive: #39e075; /* neon green — money in, score going up */
+  --negative: #e0a030; /* amber — money out, cabinet caution light */
+  --alert: #ff4060; /* hot pink — "GAME OVER" flash, real alarms only */
 
-  --positive-soft: #e6f0ea;
-  --negative-soft: #f8e9e5;
-  --alert-soft: #fbe9e7;
-
-  --shadow-sm: 0 1px 2px rgb(28 25 23 / 0.05);
-  --shadow-md: 0 4px 12px -2px rgb(28 25 23 / 0.08);
-  --shadow-lg: 0 12px 32px -8px rgb(28 25 23 / 0.14);
-
-  /* Data-mark colors, separate from the UI accent on purpose: the brand plum
-     is deliberately muted, which reads as gray when it becomes a chart fill.
-     These steps are validated (lightness band, chroma floor, CVD separation,
-     normal-vision floor, contrast) against this theme's surface. */
-  --series-1: #7a3e9e; /* spent  */
-  --series-2: #b07a2b; /* earned */
-  --chart-grid: #ece5dd;
-  --chart-track: #f0eae3;
-
-  /* Scrapbook surface, used only by Flows. Decorative — never carries text
-     contrast on its own. See docs/flow-budgets.md §9. */
-  --paper: #fdfbf7;
-  --paper-edge: #e8dfd2;
-  --tape: #e4d9c3;
-  --thread: #c3b7a6;
-  --grain: 0.025;
-}
-
-/* ---------------------------------------------------------------------------
- * Dark theme — authored deliberately, not an inversion.
- * ------------------------------------------------------------------------- */
-[data-theme="dark"] {
-  --bg: #17141a;
-  --surface: #201c27;
-  --surface-sunk: #131018;
-
-  --ink: #f5f1f7; /* 16.3:1 on bg */
-  --ink-muted: #b5aebc; /*  8.5:1 on bg */
-  --ink-subtle: #9a93a2; /*  6.1:1 on bg */
-
-  --border: #332c3c;
-  --border-strong: #79708a; /*  3.9:1 on bg */
-
-  --accent: #c9a6dc; /* plum lifted for dark surfaces — 8.7:1 on bg */
-  --accent-hover: #d9bde8;
-  --accent-soft: #2c2336;
-  --accent-on: #1a1121; /* dark ink on a filled plum surface — 8.7:1 */
-
-  --positive: #6fc098;
-  --negative: #e39078;
-  --alert: #f2b8b5;
-
-  --positive-soft: #1b3329;
-  --negative-soft: #38231c;
-  --alert-soft: #3d1f1d;
+  --positive-soft: #0d1f12;
+  --negative-soft: #1f1808;
+  --alert-soft: #1f0a10;
 
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.5);
   --shadow-lg: 0 12px 32px -8px rgb(0 0 0 / 0.6);
 
-  /* Re-stepped for the dark surface and re-validated as a set — not flipped. */
-  --series-1: #9c5fbe;
-  --series-2: #b8862f;
-  --chart-grid: #2c2635;
-  --chart-track: #2a2432;
+  /* Data-mark colors — coin gold for spending, neon green for earning.
+     Validated for CVD separation and contrast against the dark surface. */
+  --series-1: #d4a843; /* spent — coin gold  */
+  --series-2: #39e075; /* earned — neon green */
+  --chart-grid: #1a1815;
+  --chart-track: #1e1c18;
 
-  /* Its own paper, not a dimmed sheet of the light one. */
-  --paper: #241f2b;
-  --paper-edge: #372f42;
-  --tape: #4a3f58;
-  --thread: #5a5166;
-  --grain: 0.04;
+  /* Arcade cabinet panels, used by Flows. Decorative — never carries text
+     contrast on its own. See docs/flow-budgets.md §9. */
+  --paper: #121010;
+  --paper-edge: #2a2520;
+  --tape: #3a3228; /* metallic strip — coin rail */
+  --thread: #5c5040; /* wiring between nodes */
+  --grain: 0.03; /* CRT noise */
+}
+
+/* ---------------------------------------------------------------------------
+ * Dark theme — "lights off" arcade. Deeper blacks, slightly cooled gold.
+ * Authored deliberately, not an inversion of the default.
+ * ------------------------------------------------------------------------- */
+[data-theme="dark"] {
+  --bg: #050505;
+  --surface: #111111;
+  --surface-sunk: #080808;
+
+  --ink: #ede3cf; /* ~16:1 on bg */
+  --ink-muted: #9e9080; /*  ~7.5:1 on bg */
+  --ink-subtle: #6e6455; /*  ~5:1 on bg */
+
+  --border: #1f1b17;
+  --border-strong: #4a4030; /* ~3:1 on bg */
+
+  --accent: #c89b38; /* cooled coin gold */
+  --accent-hover: #d4a843;
+  --accent-soft: #1a1508;
+  --accent-on: #0a0a0a;
+
+  --positive: #30c965;
+  --negative: #cc9028;
+  --alert: #e83855;
+
+  --positive-soft: #0a1a0e;
+  --negative-soft: #1a1406;
+  --alert-soft: #1a080d;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.5);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 12px 32px -8px rgb(0 0 0 / 0.7);
+
+  /* Re-stepped for the deeper surface. */
+  --series-1: #c89b38;
+  --series-2: #30c965;
+  --chart-grid: #151310;
+  --chart-track: #181612;
+
+  /* Cabinet panel, not paper. */
+  --paper: #0e0c0a;
+  --paper-edge: #201c18;
+  --tape: #302820;
+  --thread: #4a4030;
+  --grain: 0.05;
 }
 
 /* Expose tokens to Tailwind as utilities: bg-surface, text-ink, border-border… */
@@ -141,25 +142,33 @@
   --color-tape: var(--tape);
   --color-thread: var(--thread);
 
-  --font-hand: var(--font-caveat), ui-rounded, cursive;
+  --font-hand: var(--font-press-start), ui-monospace, monospace;
+  --font-arcade: var(--font-press-start), ui-monospace, monospace;
+  --font-sans: var(--font-vt323), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-silkscreen), ui-monospace, monospace;
+  --font-numbers: var(--font-teko), ui-sans-serif, system-ui, sans-serif;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --radius-card: 0px;
+  --radius-field: 0px;
+  --radius-pill: 0px;
 
-  --radius-card: 14px;
-  --radius-field: 10px;
-  --radius-pill: 999px;
+  --shadow-card: 2px 2px 0px var(--border-strong);
+  --shadow-raised: 4px 4px 0px var(--border-strong);
+  --shadow-float: 8px 8px 0px var(--border-strong);
 
-  --shadow-card: var(--shadow-sm);
-  --shadow-raised: var(--shadow-md);
-  --shadow-float: var(--shadow-lg);
+  --ease-out: steps(4, end);
 
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Bump up all text sizes because VT323 naturally renders quite small */
+  --text-xs: 0.875rem;
+  --text-sm: 1rem;
+  --text-base: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
 }
 
 @layer base {
   html {
-    color-scheme: light;
+    color-scheme: dark;
   }
   [data-theme="dark"] {
     color-scheme: dark;
@@ -168,7 +177,7 @@
   body {
     background-color: var(--bg);
     color: var(--ink);
-    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-space-grotesk), ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
 
@@ -215,16 +224,16 @@
   /* A sheet of paper with a subtly irregular, hand-cut edge. */
   .paper {
     background-color: var(--paper);
-    border: 1px solid var(--paper-edge);
-    border-radius: 14px 12px 15px 13px / 13px 15px 12px 14px;
+    border: 2px solid var(--paper-edge);
+    border-radius: 0px;
     box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.5),
-      var(--shadow-md);
+      inset 0 1px 0 rgb(255 255 255 / 0.04),
+      var(--shadow-raised);
   }
   [data-theme="dark"] .paper {
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.04),
-      var(--shadow-md);
+      var(--shadow-raised);
   }
 
   /* One tape strip per card. Decorative only, so it is inert and hidden from

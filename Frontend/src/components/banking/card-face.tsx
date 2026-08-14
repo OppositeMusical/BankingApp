@@ -75,7 +75,7 @@ export function CardFace({
         )}
       </div>
 
-      <p className="relative font-display text-lg font-semibold tabular tracking-wide">
+      <p className="relative font-numbers text-lg font-semibold tabular tracking-wide">
         ···· {card.last4}
       </p>
     </div>

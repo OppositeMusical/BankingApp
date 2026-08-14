@@ -164,7 +164,7 @@ export function TransferFlow({ accounts }: { accounts: Account[] }) {
 
           <dl className="mt-5 divide-y divide-border border-y border-border">
             <Row term="Amount">
-              <span className="font-display text-lg font-semibold">
+              <span className="font-numbers text-lg font-semibold">
                 <Amount value={amount} />
               </span>
             </Row>

@@ -5,11 +5,13 @@ type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-accent text-accent-on hover:bg-accent-hover active:bg-accent-hover shadow-card",
+    "bg-accent text-accent-on border-2 border-border-strong shadow-card hover:bg-accent-hover active:translate-y-[2px] active:translate-x-[2px] active:shadow-none",
   secondary:
-    "bg-surface text-ink border border-border-strong hover:bg-surface-sunk",
-  ghost: "text-ink-muted hover:bg-accent-soft hover:text-accent",
-  danger: "bg-alert-soft text-alert border border-alert/30 hover:bg-alert/15",
+    "bg-surface text-ink border-2 border-border-strong shadow-card hover:bg-surface-sunk active:translate-y-[2px] active:translate-x-[2px] active:shadow-none",
+  ghost:
+    "text-ink-muted border-2 border-transparent hover:border-border-strong hover:bg-accent-soft hover:text-accent hover:shadow-card active:translate-y-[2px] active:translate-x-[2px] active:shadow-none",
+  danger:
+    "bg-alert-soft text-alert border-2 border-alert/30 shadow-card hover:bg-alert/15 active:translate-y-[2px] active:translate-x-[2px] active:shadow-none",
 };
 
 const sizes: Record<Size, string> = {

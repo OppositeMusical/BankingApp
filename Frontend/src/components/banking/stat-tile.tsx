@@ -29,7 +29,7 @@ export function StatTile({
       <p className="text-xs font-medium tracking-wide text-ink-subtle uppercase">
         {label}
       </p>
-      <p className="mt-1.5 font-display text-2xl font-semibold text-ink">
+      <p className="mt-1.5 font-numbers text-2xl font-semibold text-ink">
         <Amount value={value} tone={tone} compactWhole />
       </p>
       {caption && <p className="mt-1 text-xs text-ink-muted">{caption}</p>}

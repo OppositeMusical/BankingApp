@@ -247,7 +247,7 @@ export function FlowDetail({
                   <p className="text-sm font-medium text-ink">
                     {formatFullDate(run.occurredAt)}
                   </p>
-                  <p className="font-display text-lg font-semibold text-ink">
+                  <p className="font-numbers text-lg font-semibold text-ink">
                     <Amount value={run.depositAmount} />
                   </p>
                 </div>

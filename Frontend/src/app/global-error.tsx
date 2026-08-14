@@ -24,8 +24,8 @@ export default function GlobalError({
           display: "grid",
           placeItems: "center",
           padding: "2rem",
-          background: "#fbf8f5",
-          color: "#1c1917",
+          background: "#0a0a0a",
+          color: "#f0e6d3",
           fontFamily:
             "ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
         }}
@@ -38,7 +38,7 @@ export default function GlobalError({
             style={{
               margin: "0 0 1.25rem",
               lineHeight: 1.6,
-              color: "#57534e",
+              color: "#a89a84",
             }}
           >
             The app failed to start up. Nothing was changed, and no money moved.
@@ -49,10 +49,10 @@ export default function GlobalError({
             style={{
               minHeight: "44px",
               padding: "0 1.25rem",
-              borderRadius: "10px",
+              borderRadius: "8px",
               border: 0,
-              background: "#6b4e7a",
-              color: "#fff",
+              background: "#d4a843",
+              color: "#0a0a0a",
               fontSize: "0.875rem",
               fontWeight: 500,
               cursor: "pointer",
@@ -65,7 +65,7 @@ export default function GlobalError({
               style={{
                 marginTop: "1.5rem",
                 fontSize: "0.75rem",
-                color: "#6b6560",
+                color: "#7a7060",
               }}
             >
               Reference: <code>{error.digest}</code>

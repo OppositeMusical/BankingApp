@@ -39,7 +39,7 @@ export default async function AccountDetailPage({
           {account.name}
         </h1>
         <p className="mt-0.5 text-sm text-ink-subtle">···· {account.last4}</p>
-        <p className="mt-4 font-display text-4xl font-semibold text-ink">
+        <p className="mt-2 font-numbers text-4xl font-semibold tracking-tight text-ink">
           <Amount value={account.balance} splitFraction />
         </p>
         <p className="mt-1.5 text-sm text-ink-muted">

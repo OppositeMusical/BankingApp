@@ -112,7 +112,7 @@ export function MarketPanel({
                   )}
                 </p>
                 <p className="mt-1 flex items-baseline gap-2">
-                  <span className="font-display text-xl font-semibold tabular text-ink">
+                  <span className="font-numbers text-2xl font-semibold tabular text-ink">
                     {detail.price.toLocaleString("en-US", {
                       style: "currency",
                       currency: detail.currency,

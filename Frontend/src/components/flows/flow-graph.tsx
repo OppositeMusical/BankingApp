@@ -76,7 +76,7 @@ export function FlowGraph({
           {sourceLabel}
         </span>
         {typicalAmount && (
-          <span className="font-display text-base font-semibold text-ink">
+          <span className="font-numbers text-base font-semibold text-ink">
             <Amount value={typicalAmount} compactWhole />
           </span>
         )}

@@ -259,7 +259,7 @@ function CarouselAccountCard({ account }: { account: Account }) {
         <VisibilityBadge account={account} />
       </div>
 
-      <p className="mt-5 font-display text-2xl font-semibold text-ink">
+      <p className="mt-5 font-numbers text-2xl font-semibold text-ink">
         <Amount value={account.balance} />
       </p>
 
