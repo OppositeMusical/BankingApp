@@ -12,6 +12,7 @@ export { authApi } from "./endpoints/auth";
 export { brokerageApi } from "./endpoints/brokerage";
 export { budgetsApi } from "./endpoints/budgets";
 export { cardsApi } from "./endpoints/cards";
+export { linkedApi } from "./endpoints/linked";
 export { flowsApi } from "./endpoints/flows";
 export { healthApi } from "./endpoints/health";
 export { transfersApi } from "./endpoints/transfers";

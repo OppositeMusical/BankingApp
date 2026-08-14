@@ -1,13 +1,17 @@
 import { AccountCarousel } from "@/components/banking/account-carousel";
+import { LinkedAccounts } from "./linked-accounts";
 import { PageHeader } from "@/components/layout/page-header";
 import { Explainer } from "@/components/banking/explainer";
 import { Card, CardBody } from "@/components/ui/card";
-import { accountsApi } from "@/lib/api";
+import { accountsApi, linkedApi } from "@/lib/api";
 
 export const metadata = { title: "Accounts" };
 
 export default async function AccountsPage() {
-  const accounts = await accountsApi.list();
+  const [accounts, linked] = await Promise.all([
+    accountsApi.list(),
+    linkedApi.list(),
+  ]);
 
   return (
     <>
@@ -17,6 +21,8 @@ export default async function AccountsPage() {
       />
 
       <AccountCarousel accounts={accounts} />
+
+      <LinkedAccounts accounts={linked} />
 
       <Card className="mt-6">
         <CardBody className="pt-5">
