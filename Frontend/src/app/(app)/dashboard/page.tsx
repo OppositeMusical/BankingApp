@@ -26,6 +26,11 @@ export default async function DashboardPage() {
     accounts.map((account) => [account.id, account.name]),
   );
 
+  // Summing the bank account AND its sub-accounts is correct, not a double
+  // count: they are siblings in the ledger. Moving $500 into a sub-account
+  // takes $500 out of the bank account, so the two never describe the same
+  // dollar. Leaving the bank account out undercounted by whatever was
+  // unallocated.
   const depositAccounts = accounts.filter((a) => a.kind !== "credit");
   const totalBalance = sumMoney(
     depositAccounts.map((a) => a.balance),

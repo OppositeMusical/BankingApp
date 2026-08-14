@@ -113,8 +113,9 @@ export function toAccountFromContainer(account: WireAccount): Account {
     id: account.id,
     // It IS the container, so there is no parent to point at.
     parentAccountId: undefined,
-    name: account.type === "business" ? "Business account" : "Personal account",
+    name: account.type === "business" ? "Business account" : "Main account",
     kind: "checking",
+    isBankAccount: true,
     // The real account number's last four once the bank has provisioned one.
     // Falling back to the uuid is a placeholder for the seconds before that.
     last4: lastFour(bank?.accountNumber ?? account.id),
@@ -174,6 +175,7 @@ export function toAccount(
       : { amount: 0, currency: "USD" },
     visibility: deriveVisibility(shares),
     sharedWith: shares,
+    isBankAccount: false,
     bank: options.bank,
     // No interest rate exists on the wire; omitted rather than invented, so
     // the UI simply doesn't render the line.

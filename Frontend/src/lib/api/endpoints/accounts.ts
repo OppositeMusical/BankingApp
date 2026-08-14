@@ -81,21 +81,27 @@ export const accountsApi = {
                 : Promise.resolve({ members: [] }),
             ]);
 
-            if (subAccounts.subAccounts.length === 0) {
-              return [toAccountFromContainer(account)];
-            }
+            // The bank account itself comes FIRST, then its sub-accounts.
+            //
+            // It used to be dropped whenever sub-accounts existed, which hid
+            // the real Column account entirely and undercounted every total by
+            // whatever sat unallocated in it. The two are siblings in the
+            // ledger: moving $500 into a sub-account takes $500 out of the
+            // bank account, and the sum of both is what the customer has.
+            const bankAccount = toAccountFromContainer(account);
 
-            // Pots inherit the container's bank details: an inbound wire
-            // reaches a pot through the parent's account number, not one of
-            // its own.
-            const container = toAccountFromContainer(account);
-            return subAccounts.subAccounts.map((subAccount) =>
-              toAccount(subAccount, {
-                members: members.members,
-                parentAccountId: account.id,
-                bank: container.bank,
-              }),
-            );
+            // Sub-accounts share the parent's numbers. An inbound wire reaches
+            // one through the bank account's details, not any of its own.
+            return [
+              bankAccount,
+              ...subAccounts.subAccounts.map((subAccount) =>
+                toAccount(subAccount, {
+                  members: members.members,
+                  parentAccountId: account.id,
+                  bank: bankAccount.bank,
+                }),
+              ),
+            ];
           }),
         );
 

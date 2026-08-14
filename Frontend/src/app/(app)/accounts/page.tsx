@@ -13,6 +13,11 @@ export default async function AccountsPage() {
     linkedApi.list(),
   ]);
 
+  // The real Column accounts, and the sub-accounts that divide them. Siblings
+  // in the ledger, so they are shown as two sections rather than one list.
+  const bankAccounts = accounts.filter((account) => account.isBankAccount);
+  const subAccounts = accounts.filter((account) => !account.isBankAccount);
+
   return (
     <>
       <PageHeader
@@ -20,7 +25,37 @@ export default async function AccountsPage() {
         description="Every account, and exactly who else can see it."
       />
 
-      <AccountCarousel accounts={accounts} />
+      {bankAccounts.length > 0 && (
+        <section aria-labelledby="bank-heading" className="mb-8">
+          <h2
+            id="bank-heading"
+            className="mb-1 font-display text-xl font-semibold text-ink"
+          >
+            Your bank account
+          </h2>
+          <p className="mb-3 max-w-prose text-sm text-ink-muted">
+            Held at Column. This is the account number money arrives at — the
+            balance here is whatever you haven&apos;t set aside yet.
+          </p>
+          <AccountCarousel accounts={bankAccounts} />
+        </section>
+      )}
+
+      {subAccounts.length > 0 && (
+        <section aria-labelledby="pots-heading" className="mb-8">
+          <h2
+            id="pots-heading"
+            className="mb-1 font-display text-xl font-semibold text-ink"
+          >
+            Set aside
+          </h2>
+          <p className="mb-3 max-w-prose text-sm text-ink-muted">
+            Divisions of the account above. Each keeps its own balance and can
+            hold its own card, but they share one account number.
+          </p>
+          <AccountCarousel accounts={subAccounts} />
+        </section>
+      )}
 
       <LinkedAccounts accounts={linked} />
 

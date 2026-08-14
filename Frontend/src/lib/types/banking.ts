@@ -37,7 +37,16 @@ export type Account = {
   visibility: AccountVisibility;
   /** People other than the owner who can see this account. */
   sharedWith: AccountShare[];
-  /** Real bank details. Lives on the container, so pots inherit the parent's. */
+  /**
+   * True for the real bank account at Column, false for a sub-account of it.
+   *
+   * The two are SIBLINGS in the ledger, not nested: the bank account holds
+   * whatever has not been allocated to a sub-account, and the total is the sum
+   * of both. Treating a sub-account balance as part of its parent's would
+   * double-count; ignoring the parent undercounts by the unallocated amount.
+   */
+  isBankAccount?: boolean;
+  /** Real bank details. Only the bank account has them; sub-accounts share it. */
   bank?: BankDetails;
   interestRateBps?: number;
 };
