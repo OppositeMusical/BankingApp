@@ -160,7 +160,7 @@ export function TradeDesk({
         />
       </div>
 
-      <MarketPanel initialQuotes={quotes} onPick={setSymbol} />
+      <MarketPanel holdings={holdings} quotes={quotes} onPick={setSymbol} />
 
       <Card className="mb-6">
         <CardHeader>

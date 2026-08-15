@@ -1,11 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, TrendingDown, TrendingUp } from "lucide-react";
 import { PriceChart } from "@/components/charts/price-chart";
 import { Sparkline } from "@/components/charts/sparkline";
 import { Card, CardBody } from "@/components/ui/card";
+import { StockSearchDialog } from "./stock-search-dialog";
+import { portfolioSeries } from "@/lib/market/portfolio";
 import type { Quote, Range } from "@/lib/market/quotes";
+import type { Holding } from "@/lib/api/endpoints/brokerage";
 import { cn } from "@/lib/utils/cn";
 
 const ranges: Range[] = ["1d", "5d", "1mo", "6mo", "1y", "5y"];
@@ -19,224 +22,202 @@ const rangeLabels: Record<Range, string> = {
   "5y": "5Y",
 };
 
-/** How long to wait after a keystroke before asking upstream. */
-const DEBOUNCE_MS = 250;
-
+/**
+ * The account's portfolio: what it holds, charted, and nothing else.
+ *
+ * The list used to be padded out with a catalogue of well-known tickers, which
+ * put stocks on screen the account had never touched and made a holding
+ * indistinguishable from a suggestion. Anything not held or ordered now lives
+ * behind the search dialog — which carries its own chart, so browsing cannot
+ * overwrite the view of your own money.
+ */
 export function MarketPanel({
-  initialQuotes,
+  holdings,
+  quotes: initialQuotes,
   onPick,
 }: {
-  initialQuotes: Quote[];
+  holdings: Holding[];
+  /** Quotes for the held and ordered symbols, fetched on the server. */
+  quotes: Quote[];
   /** Fills the order form when a row is chosen. */
   onPick?: (symbol: string) => void;
 }) {
-  const [query, setQuery] = useState("");
-  // Only search results are stored; the default list is derived, so there is
-  // no effect writing state just to copy a prop back into it.
-  const [results, setResults] = useState<Quote[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState<string | null>(
-    initialQuotes[0]?.symbol ?? null,
-  );
   const [range, setRange] = useState<Range>("1mo");
-  const [detail, setDetail] = useState<Quote | null>(initialQuotes[0] ?? null);
+  const [quotes, setQuotes] = useState(initialQuotes);
+  const [searchOpen, setSearchOpen] = useState(false);
 
-  // Every fetch is tagged; a slow early response must not overwrite a fast
-  // later one. Without this, typing "A" then "AAPL" can leave A's results on
-  // screen.
-  const listRun = useRef(0);
-  const detailRun = useRef(0);
-
+  // The server rendered 1mo; any other range is a client concern.
   useEffect(() => {
-    const trimmed = query.trim();
-    if (!trimmed) return;
+    if (range === "1mo") return;
+    const symbols = initialQuotes.map((quote) => quote.symbol);
+    if (symbols.length === 0) return;
 
-    const run = ++listRun.current;
-    const timer = setTimeout(async () => {
-      setLoading(true);
-      try {
-        // Searches every listed equity, ETF and fund — not the local
-        // catalogue, which is only the default watchlist.
-        const response = await fetch(
-          `/api/market?q=${encodeURIComponent(trimmed)}&range=1mo`,
-        );
-        const data = (await response.json()) as { quotes: Quote[] };
-        if (run === listRun.current) setResults(data.quotes);
-      } catch {
-        if (run === listRun.current) setResults([]);
-      } finally {
-        if (run === listRun.current) setLoading(false);
-      }
-    }, DEBOUNCE_MS);
-
-    return () => clearTimeout(timer);
-  }, [query]);
-
-  useEffect(() => {
-    if (!selected) return;
-    const run = ++detailRun.current;
+    let cancelled = false;
     (async () => {
       try {
         const response = await fetch(
-          `/api/market?symbols=${selected}&range=${range}`,
+          `/api/market?symbols=${symbols.join(",")}&range=${range}`,
         );
         const data = (await response.json()) as { quotes: Quote[] };
-        if (run === detailRun.current) setDetail(data.quotes[0] ?? null);
+        if (!cancelled) setQuotes(data.quotes);
       } catch {
-        /* keep the last good chart rather than blanking it */
+        /* keep the last good series rather than blanking the chart */
       }
     })();
-  }, [selected, range]);
+    return () => {
+      cancelled = true;
+    };
+  }, [range, initialQuotes]);
 
-  const searching = query.trim().length > 0;
-  const rows = searching ? results : initialQuotes;
-  const empty = searching && !loading && rows.length === 0;
-  const heading = useMemo(
-    () => (query.trim() ? "Results" : "Markets"),
-    [query],
+  const shown = range === "1mo" ? initialQuotes : quotes;
+  const portfolio = useMemo(
+    () => portfolioSeries(holdings, shown),
+    [holdings, shown],
   );
 
   return (
     <>
-      {detail && (
-        <Card className="mb-6">
-          <CardBody className="pt-5">
-            <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="font-display text-2xl font-semibold text-ink">
-                  {detail.symbol}
-                  {detail.name && (
-                    <span className="ml-2 text-sm font-normal text-ink-subtle">
-                      {detail.name}
-                    </span>
-                  )}
-                </p>
-                <p className="mt-1 flex items-baseline gap-2">
-                  <span className="font-numbers text-2xl font-semibold tabular text-ink">
-                    {detail.price.toLocaleString("en-US", {
-                      style: "currency",
-                      currency: detail.currency,
-                    })}
-                  </span>
-                  <ChangeBadge percent={detail.changePercent} />
-                </p>
-              </div>
-
-              <div
-                role="group"
-                aria-label="Chart range"
-                className="inline-flex rounded-pill border border-border p-0.5"
-              >
-                {ranges.map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => setRange(option)}
-                    aria-pressed={range === option}
-                    className={cn(
-                      "inline-flex h-8 items-center rounded-pill px-2.5 text-xs font-medium transition-colors",
-                      range === option
-                        ? "bg-accent-soft text-accent"
-                        : "text-ink-muted hover:text-ink",
-                    )}
-                  >
-                    {rangeLabels[option]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <PriceChart quote={detail} />
-          </CardBody>
-        </Card>
-      )}
-
-      <section aria-labelledby="market-heading" className="mb-6">
+      <section aria-labelledby="portfolio-heading" className="mb-6">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h2
-            id="market-heading"
+            id="portfolio-heading"
             className="font-display text-xl font-semibold text-ink"
           >
-            {heading}
+            Your portfolio
           </h2>
-          <label className="relative">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-subtle"
-              aria-hidden
-            />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search any stock, ETF or fund"
-              aria-label="Search stocks"
-              className="h-10 w-64 rounded-field border border-border-strong bg-surface pl-9 pr-3 text-sm text-ink"
-            />
-          </label>
+          <button
+            type="button"
+            onClick={() => setSearchOpen(true)}
+            className="inline-flex h-10 items-center gap-2 rounded-field border border-border-strong bg-surface px-3.5 text-sm font-medium text-ink hover:bg-surface-sunk"
+          >
+            <Search className="size-4" aria-hidden />
+            Search stocks
+          </button>
         </div>
 
         <Card>
-          {empty ? (
-            <CardBody className="pt-5">
-              <p className="text-sm text-ink-muted">
-                Nothing found for &ldquo;{query.trim()}&rdquo;.
-              </p>
-            </CardBody>
-          ) : (
-            <ul className={cn("divide-y divide-border", loading && "opacity-60")}>
-              {rows.map((quote) => (
-                <li key={quote.symbol}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelected(quote.symbol);
-                      onPick?.(quote.symbol);
-                    }}
-                    aria-current={selected === quote.symbol || undefined}
-                    className={cn(
-                      "flex w-full items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-surface-sunk",
-                      selected === quote.symbol && "bg-accent-soft/40",
-                    )}
+          <CardBody className="pt-5">
+            {portfolio ? (
+              <>
+                <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <p className="font-numbers text-2xl font-semibold tabular text-ink">
+                      {portfolio.price.toLocaleString("en-US", {
+                        style: "currency",
+                        currency: portfolio.currency,
+                      })}
+                    </p>
+                    <p className="mt-1 flex items-baseline gap-2 text-sm">
+                      <Change percent={portfolio.changePercent} />
+                      <span className="text-ink-subtle">
+                        over {rangeLabels[range]}
+                      </span>
+                    </p>
+                  </div>
+
+                  <div
+                    role="group"
+                    aria-label="Chart range"
+                    className="inline-flex rounded-pill border border-border p-0.5"
                   >
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-medium text-ink">
-                        {quote.symbol}
-                      </span>
-                      {quote.name && (
-                        <span className="block truncate text-xs text-ink-subtle">
-                          {quote.name}
-                        </span>
-                      )}
-                    </span>
+                    {ranges.map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        onClick={() => setRange(option)}
+                        aria-pressed={range === option}
+                        className={cn(
+                          "inline-flex h-8 items-center rounded-pill px-2.5 text-xs font-medium transition-colors",
+                          range === option
+                            ? "bg-accent-soft text-accent"
+                            : "text-ink-muted hover:text-ink",
+                        )}
+                      >
+                        {rangeLabels[option]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-                    <Sparkline points={quote.points} className="shrink-0" />
+                <PriceChart quote={portfolio} />
 
-                    <span className="w-24 shrink-0 text-right">
-                      <span className="block text-sm tabular text-ink">
-                        {quote.price.toLocaleString("en-US", {
-                          style: "currency",
-                          currency: quote.currency,
-                        })}
-                      </span>
-                      <ChangeBadge percent={quote.changePercent} compact />
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+                <p className="mt-2 text-xs text-ink-subtle">
+                  What you hold today, valued back through this period — not a
+                  record of what the account was worth then. Position history
+                  isn&apos;t published, so buys and sales part-way through
+                  aren&apos;t reflected.
+                </p>
+              </>
+            ) : (
+              <p className="py-6 text-center text-sm text-ink-muted">
+                Nothing held yet. Search for a stock to place your first order,
+                and this becomes a chart of what you own.
+              </p>
+            )}
+          </CardBody>
         </Card>
-
-        <p className="mt-2 text-xs text-ink-subtle">
-          Real market data, cached for a minute. Orders still fill at the
-          sandbox&apos;s own price — these quotes are for looking, not for
-          pricing a trade.
-        </p>
       </section>
+
+      {shown.length > 0 && (
+        <section aria-labelledby="stocks-heading" className="mb-6">
+          <h2
+            id="stocks-heading"
+            className="mb-3 font-display text-xl font-semibold text-ink"
+          >
+            Your stocks
+          </h2>
+          <Card>
+            <ul className="divide-y divide-border">
+              {shown.map((quote) => {
+                const held = holdings.find(
+                  (holding) => holding.symbol === quote.symbol,
+                );
+                return (
+                  <li key={quote.symbol}>
+                    <button
+                      type="button"
+                      onClick={() => onPick?.(quote.symbol)}
+                      className="flex w-full items-center gap-3 px-5 py-3 text-left hover:bg-surface-sunk"
+                    >
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-medium text-ink">
+                          {quote.symbol}
+                        </span>
+                        <span className="block truncate text-xs text-ink-subtle">
+                          {held
+                            ? `${held.quantity.toFixed(4)} shares`
+                            : "Ordered, not filled yet"}
+                        </span>
+                      </span>
+                      <Sparkline points={quote.points} className="shrink-0" />
+                      <span className="w-24 shrink-0 text-right">
+                        <span className="block text-sm tabular text-ink">
+                          {quote.price.toLocaleString("en-US", {
+                            style: "currency",
+                            currency: quote.currency,
+                          })}
+                        </span>
+                        <Change percent={quote.changePercent} compact />
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </Card>
+        </section>
+      )}
+
+      <StockSearchDialog
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        onPick={(symbol) => onPick?.(symbol)}
+      />
     </>
   );
 }
 
-function ChangeBadge({
+function Change({
   percent,
   compact = false,
 }: {
@@ -249,7 +230,7 @@ function ChangeBadge({
     <span
       className={cn(
         "inline-flex items-center gap-1 tabular",
-        compact ? "text-xs" : "text-sm font-medium",
+        compact ? "block text-xs" : "text-sm font-medium",
         rising ? "text-positive" : "text-negative",
       )}
     >

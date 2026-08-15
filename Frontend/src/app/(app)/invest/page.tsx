@@ -5,7 +5,6 @@ import { TradeDesk } from "./trade-desk";
 import { accountsApi, brokerageApi } from "@/lib/api";
 import { showingSample } from "@/lib/api/sample";
 import { fetchQuotes } from "@/lib/market/quotes";
-import { symbols as catalogue } from "@/lib/market/symbols";
 
 export const metadata = { title: "Invest" };
 
@@ -29,14 +28,16 @@ export default async function InvestPage() {
     accountsApi.list(),
   ]);
 
-  // What you hold first, then the catalogue — a positions screen should open
-  // on your own money, not on someone's idea of a default watchlist.
-  const held = holdings.map((holding) => holding.symbol);
+  // Only what this account actually touched: what it holds, plus anything
+  // ordered but not filled yet. No catalogue padding — a stock the account has
+  // never touched belongs behind the search dialog, not on the page.
   const watchlist = [
-    ...held,
-    ...catalogue.map((entry) => entry.symbol).filter((s) => !held.includes(s)),
-  ].slice(0, 8);
-  const quotes = await fetchQuotes(watchlist);
+    ...new Set([
+      ...holdings.map((holding) => holding.symbol),
+      ...orders.map((order) => order.symbol),
+    ]),
+  ].slice(0, 12);
+  const quotes = watchlist.length > 0 ? await fetchQuotes(watchlist) : [];
 
   return (
     <>
