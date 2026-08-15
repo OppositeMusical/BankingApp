@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 import { ArrowRight, ArrowLeftRight, Snowflake } from "lucide-react";
 import { Amount } from "@/components/banking/amount";
 import { AccountCard } from "@/components/banking/account-card";
@@ -49,7 +50,7 @@ export default async function DashboardPage() {
         <p className="text-sm text-ink-muted">
           Good afternoon{person ? `, ${person.displayName}` : ""}
         </p>
-        <p className="mt-2 font-display text-5xl font-semibold tracking-tight text-ink sm:text-6xl">
+        <p className="mt-2 font-numbers text-5xl font-semibold tracking-tight text-ink sm:text-6xl">
           <Amount value={totalBalance} splitFraction />
         </p>
         <p className="mt-2 text-sm text-ink-muted">
@@ -60,7 +61,7 @@ export default async function DashboardPage() {
         <div className="mt-5 flex flex-wrap gap-2.5">
           <Link
             href="/transfer"
-            className="inline-flex h-11 items-center gap-2 rounded-field bg-accent px-5 text-sm font-medium text-accent-on shadow-card transition-colors hover:bg-accent-hover"
+            className={buttonVariants({ variant: "primary", size: "md" })}
           >
             <ArrowLeftRight className="size-4" aria-hidden />
             Move money

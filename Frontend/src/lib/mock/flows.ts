@@ -128,7 +128,7 @@ export const flows: Flow[] = [
     ],
     createdAt: daysAgo(45),
     attentionReason:
-      "The Aster Card is frozen, so the 60% share has nowhere to go. Unfreeze it, or pick a different destination.",
+      "The Talents Card is frozen, so the 60% share has nowhere to go. Unfreeze it, or pick a different destination.",
   },
 ];
 

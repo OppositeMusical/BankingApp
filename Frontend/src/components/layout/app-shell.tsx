@@ -40,9 +40,9 @@ export function AppShell({
           href="/dashboard"
           className="mb-8 flex items-center gap-2.5 px-2 rounded-field"
         >
-          <AsterMark />
+          <TalentsMark />
           <span className="font-display text-xl font-semibold tracking-tight">
-            Aster
+            Talents
           </span>
         </Link>
 
@@ -60,7 +60,11 @@ export function AppShell({
                   : "text-ink-muted hover:bg-surface-sunk hover:text-ink",
               )}
             >
-              <Icon className="size-[18px] shrink-0" aria-hidden />
+              <Icon
+                className="size-[20px] shrink-0 drop-shadow-[2px_2px_0px_var(--color-border-strong)]"
+                strokeWidth={2.5}
+                aria-hidden
+              />
               {label}
             </Link>
           ))}
@@ -79,8 +83,8 @@ export function AppShell({
       <header className="sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur-md lg:pl-64">
         <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link href="/dashboard" className="flex items-center gap-2 lg:hidden">
-            <AsterMark />
-            <span className="font-display text-lg font-semibold">Aster</span>
+            <TalentsMark />
+            <span className="font-display text-lg font-semibold">Talents</span>
           </Link>
 
           <p className="hidden text-sm text-ink-muted lg:block">
@@ -129,7 +133,11 @@ export function AppShell({
                   isActive(href) ? "text-accent" : "text-ink-subtle",
                 )}
               >
-                <Icon className="size-5" aria-hidden />
+                <Icon
+                  className="size-5 drop-shadow-[2px_2px_0px_var(--color-border-strong)]"
+                  strokeWidth={2.5}
+                  aria-hidden
+                />
                 {label}
               </Link>
             </li>
@@ -176,7 +184,7 @@ function DataSourceBadge({ mode }: { mode: ApiMode }) {
   );
 }
 
-function AsterMark() {
+function TalentsMark() {
   return (
     <span
       aria-hidden

@@ -4,6 +4,7 @@ import { FlowsGrid } from "./flows-grid";
 import { PageHeader } from "@/components/layout/page-header";
 import { Explainer } from "@/components/banking/explainer";
 import { flowsApi } from "@/lib/api";
+import { buttonVariants } from "@/components/ui/button";
 
 export const metadata = { title: "Flows" };
 
@@ -18,7 +19,7 @@ export default async function FlowsPage() {
         action={
           <Link
             href="/flows/new"
-            className="inline-flex h-11 items-center gap-2 rounded-field bg-accent px-5 text-sm font-medium text-accent-on shadow-card transition-colors hover:bg-accent-hover"
+            className={buttonVariants({ variant: "primary", size: "md" })}
           >
             <Plus className="size-4" aria-hidden />
             New flow

@@ -31,7 +31,7 @@ export default function SignInPage() {
             </svg>
           </span>
           <span className="font-display text-2xl font-semibold tracking-tight text-ink">
-            Aster
+            Talents
           </span>
         </Link>
 

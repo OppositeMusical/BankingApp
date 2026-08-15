@@ -25,8 +25,8 @@ type UIPreferences = {
 
 const UIPreferencesContext = createContext<UIPreferences | null>(null);
 
-const THEME_KEY = "aster.theme";
-const PRIVACY_KEY = "aster.privacy";
+const THEME_KEY = "talents.theme";
+const PRIVACY_KEY = "talents.privacy";
 
 /*
  * The <html> element is the source of truth for both preferences: the inline

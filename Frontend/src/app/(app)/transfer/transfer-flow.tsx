@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check, TriangleAlert } from "lucide-react";
+import { ArrowRight, Check, TriangleAlert, X } from "lucide-react";
 import { Amount } from "@/components/banking/amount";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardBody } from "@/components/ui/card";
 import { NoData } from "@/components/banking/no-data";
 import { describeError, toHolder, transfersApi } from "@/lib/api";
@@ -129,7 +129,7 @@ export function TransferFlow({ accounts }: { accounts: Account[] }) {
           <div className="mt-6 flex justify-center gap-2.5">
             <Link
               href="/dashboard"
-              className="inline-flex h-11 items-center rounded-field bg-accent px-5 text-sm font-medium text-accent-on"
+              className={buttonVariants({ variant: "primary", size: "md" })}
             >
               Back to home
             </Link>

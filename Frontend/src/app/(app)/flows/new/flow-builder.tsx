@@ -42,6 +42,7 @@ const builderFixtures = () => ({
   sourceSuggestions: sample(sourceFixtures, []),
 });
 import { formatMoney } from "@/lib/format/money";
+import { buttonVariants } from "@/components/ui/button";
 import type { Account } from "@/lib/types/banking";
 import type { Flow, FlowSourceSuggestion, FlowSplit } from "@/lib/types/flows";
 import { cn } from "@/lib/utils/cn";
@@ -606,7 +607,7 @@ function BuilderDone({
         </p>
         <Link
           href="/flows"
-          className="mt-5 inline-flex h-11 items-center rounded-field bg-accent px-5 text-sm font-medium text-accent-on"
+          className={cn("mt-5", buttonVariants({ variant: "primary", size: "md" }))}
         >
           Back to flows
         </Link>

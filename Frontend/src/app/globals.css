@@ -146,7 +146,7 @@
   --font-arcade: var(--font-press-start), ui-monospace, monospace;
   --font-sans: var(--font-vt323), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-silkscreen), ui-monospace, monospace;
-  --font-numbers: var(--font-teko), ui-sans-serif, system-ui, sans-serif;
+  --font-numbers: var(--font-orbitron), ui-sans-serif, system-ui, sans-serif;
 
   --radius-card: 0px;
   --radius-field: 0px;
@@ -187,6 +187,28 @@
     outline: 2px solid var(--accent);
     outline-offset: 2px;
     border-radius: 4px;
+  }
+
+  /* Chunky Arcade Scrollbars */
+  ::-webkit-scrollbar {
+    width: 16px;
+    height: 16px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
+    border-left: 2px solid var(--border-strong);
+    border-top: 2px solid var(--border-strong);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--accent);
+    border: 2px solid var(--border-strong);
+    border-radius: 0;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-hover);
+  }
+  ::-webkit-scrollbar-corner {
+    background: var(--bg);
   }
 
   /* Money and any aligned figures use tabular lining numerals so columns

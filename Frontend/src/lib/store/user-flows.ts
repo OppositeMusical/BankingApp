@@ -12,7 +12,7 @@ import type { Flow } from "@/lib/types/flows";
  * should have to be inside a provider to do so.
  */
 
-const KEY = "aster.flows";
+const KEY = "talents.flows";
 const EMPTY: Flow[] = [];
 
 let cache: Flow[] | null = null;

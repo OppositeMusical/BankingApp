@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 import {
   ArrowRight,
   EyeOff,
@@ -50,7 +51,7 @@ export default function LandingPage() {
             </svg>
           </span>
           <span className="font-display text-xl font-semibold tracking-tight">
-            Aster
+            Talents
           </span>
         </div>
         <Link
@@ -79,9 +80,9 @@ export default function LandingPage() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/dashboard"
-              className="inline-flex h-13 items-center gap-2 rounded-field bg-accent px-7 text-base font-medium text-accent-on shadow-card transition-colors hover:bg-accent-hover"
+              className={buttonVariants({ variant: "primary", size: "lg" })}
             >
-              See the app
+              Sign in to demo app
               <ArrowRight className="size-4" aria-hidden />
             </Link>
             <Link
@@ -150,7 +151,7 @@ export default function LandingPage() {
 
       <footer className="border-t border-border py-8">
         <p className="mx-auto max-w-5xl px-5 text-xs text-ink-subtle">
-          Aster is a design prototype. Balances, transactions, and projections
+          Talents is a design prototype. Balances, transactions, and projections
           shown in the app are illustrative sample data.
         </p>
       </footer>

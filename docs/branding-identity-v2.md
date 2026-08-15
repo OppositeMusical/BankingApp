@@ -138,7 +138,7 @@ On dark surfaces, shadows are deep blacks with slight gold-warm tinting. Glows r
 |---|---|---|
 | **VT323** (`--font-sans`) | Body / UI | Classic retro CRT terminal font for body copy, labels, form controls, and lists. |
 | **Silkscreen** (`--font-display`) | Display / Headings | Authentic 8-bit arcade pixel font for page headings (`h1`–`h2`) and the Aster wordmark. |
-| **Teko** (`--font-numbers`) | Numbers / Balances | Tall, impactful retro-tech font for account balances and amounts. Legible but heavily stylized. |
+| **Orbitron** (`--font-numbers`) | Numbers / Balances | Highly stylized retro-futuristic digital font for account balances and amounts. |
 | **Press Start 2P** (`--font-arcade` / `--font-hand`) | Arcade Accents / Badges / Flows | Classic 8-bit coin-op pixel font for flow nodes, arcade accents, and retro badges. |
 
 ### Typographic Rules

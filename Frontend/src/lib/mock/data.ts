@@ -72,7 +72,7 @@ export const accounts: Account[] = [
   },
   {
     id: "acc_credit",
-    name: "Aster Card",
+    name: "Talents Card",
     kind: "credit",
     last4: "2265",
     balance: usd(-84_120),
@@ -279,7 +279,7 @@ export const cards: Card[] = [
   {
     id: "card_2",
     accountId: "acc_credit",
-    label: "Aster Card",
+    label: "Talents Card",
     last4: "2265",
     status: "active",
     expiry: "02/30",
@@ -296,7 +296,7 @@ export const sessions: Session[] = [
   },
   {
     id: "ses_2",
-    device: "iPhone 16 · Aster app",
+    device: "iPhone 16 · Talents app",
     location: "Chicago, IL",
     lastActiveAt: daysAgo(0, 8, 10),
     current: false,

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Press_Start_2P, Silkscreen, VT323, Teko } from "next/font/google";
+import { Press_Start_2P, Silkscreen, VT323, Orbitron } from "next/font/google";
 import "./globals.css";
 // Side effect only: registers the cookie-backed auth token source so server
 // components can make authenticated connector calls in live mode.
@@ -24,9 +24,10 @@ const silkscreen = Silkscreen({
   display: "swap",
 });
 
-// Impactful retro-tech font for numbers
-const teko = Teko({
-  variable: "--font-teko",
+// Highly stylized retro-futuristic font for big numbers (arcade scores)
+const orbitron = Orbitron({
+  weight: ["500", "700", "900"],
+  variable: "--font-orbitron",
   subsets: ["latin"],
   display: "swap",
 });
@@ -41,8 +42,8 @@ const pressStart2P = Press_Start_2P({
 
 export const metadata: Metadata = {
   title: {
-    default: "Aster — banking that keeps your money in plain sight",
-    template: "%s · Aster",
+    default: "Talents — banking that keeps your money in plain sight",
+    template: "%s · Talents",
   },
   description:
     "A bank account with real privacy controls, honest fees, and planning built for careers that don't run in a straight line.",
@@ -56,12 +57,12 @@ export const metadata: Metadata = {
 const themeScript = `
 (function () {
   try {
-    var stored = localStorage.getItem('aster.theme');
+    var stored = localStorage.getItem('talents.theme');
     var theme = stored === 'light' || stored === 'dark'
       ? stored
       : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     document.documentElement.setAttribute('data-theme', theme);
-    if (localStorage.getItem('aster.privacy') === 'true') {
+    if (localStorage.getItem('talents.privacy') === 'true') {
       document.documentElement.setAttribute('data-privacy', 'on');
     }
   } catch (e) {
@@ -79,7 +80,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${vt323.variable} ${silkscreen.variable} ${teko.variable} ${pressStart2P.variable} h-full`}
+      className={`${vt323.variable} ${silkscreen.variable} ${orbitron.variable} ${pressStart2P.variable} h-full`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
