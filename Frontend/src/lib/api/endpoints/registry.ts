@@ -49,6 +49,10 @@ export const liveOperations = [
   "brokerage.account",
   "brokerage.orders",
   "brokerage.holdings",
+  // Real value over time, replayed from fills rather than approximated from
+  // today's quantities. See lib/market/portfolio.ts — the approximation there
+  // is now redundant for accounts with fills.
+  "brokerage.portfolioHistory",
   "transfers.external",
   "linkedAccounts.list",
 ] as const;
@@ -60,12 +64,7 @@ export type LiveOperation = (typeof liveOperations)[number];
  * the gap is visible in code review rather than inferred from an absence.
  */
 /** Operations the contract does not serve yet. */
-export const pendingOperations = [
-  // Real portfolio value over time. Until this exists the chart approximates
-  // it from today's quantities, which is not the same question — see
-  // lib/market/portfolio.ts and docs/backend-portfolio-history.md.
-  "brokerage.portfolioHistory",
-] as const;
+export const pendingOperations = [] as const;
 
 export type PendingOperation = (typeof pendingOperations)[number];
 

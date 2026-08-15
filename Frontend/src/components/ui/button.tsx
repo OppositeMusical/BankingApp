@@ -5,13 +5,13 @@ type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-[#00f0ff] text-black border-4 border-black shadow-[4px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#5cffff] active:translate-y-[6px] active:translate-x-[4px] active:shadow-none uppercase tracking-widest font-display",
+    "bg-gradient-to-b from-accent-hover to-accent text-accent-on shadow-[inset_0_1px_1px_rgba(255,255,255,0.5),0_2px_5px_rgba(0,0,0,0.5)] border border-[#a87f17] hover:brightness-110 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] active:brightness-95",
   secondary:
-    "bg-[#ffe600] text-black border-4 border-black shadow-[4px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#fff04d] active:translate-y-[6px] active:translate-x-[4px] active:shadow-none uppercase tracking-widest font-display",
+    "bg-gradient-to-b from-[#323236] to-[#1f1f22] text-ink shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_5px_rgba(0,0,0,0.5)] border border-[#141417] hover:brightness-110 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] active:brightness-95",
   ghost:
-    "text-ink-muted border-4 border-transparent hover:border-black hover:bg-surface-sunk hover:text-ink hover:shadow-[4px_6px_0px_0px_rgba(0,0,0,1)] active:translate-y-[6px] active:translate-x-[4px] active:shadow-none uppercase tracking-widest font-display",
+    "text-ink-muted hover:bg-white/5 hover:text-ink hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_2px_5px_rgba(0,0,0,0.3)] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] active:bg-black/20",
   danger:
-    "bg-[#ff003c] text-white border-4 border-black shadow-[4px_6px_0px_0px_rgba(0,0,0,1)] hover:bg-[#ff4d79] active:translate-y-[6px] active:translate-x-[4px] active:shadow-none uppercase tracking-widest font-display",
+    "bg-gradient-to-b from-alert to-[#c92a2a] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_2px_5px_rgba(0,0,0,0.5)] border border-[#8b1414] hover:brightness-110 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] active:brightness-95",
 };
 
 const sizes: Record<Size, string> = {
@@ -36,7 +36,7 @@ export function buttonVariants({
   className?: string;
 } = {}) {
   return cn(
-    "inline-flex items-center justify-center rounded-sm font-medium",
+    "inline-flex items-center justify-center rounded-field font-medium",
     "transition-colors duration-150 ease-[var(--ease-out)]",
     "disabled:pointer-events-none disabled:opacity-50",
     variants[variant],

@@ -45,54 +45,31 @@ function FlowsEmptyState({ sample }: { sample: boolean }) {
   // balance somebody owns.
   if (!sample) {
     return (
-      <div className="relative flex flex-col rounded-t-xl rounded-b-md border-4 border-border-strong bg-surface-sunk p-2 shadow-card max-w-lg mx-auto">
-        <div className="mb-3 mt-1 flex justify-center gap-1.5 opacity-50" aria-hidden>
-          <div className="h-2 w-8 rounded-full bg-border-strong shadow-inner"></div>
-          <div className="h-2 w-8 rounded-full bg-border-strong shadow-inner"></div>
-          <div className="h-2 w-8 rounded-full bg-border-strong shadow-inner"></div>
-        </div>
-        <div className="relative flex-1 rounded-md border-2 border-border-strong bg-surface p-7 shadow-sm">
-          <div className="mb-4 border-b-2 border-border pb-2">
-             <span className="font-display text-[10px] uppercase tracking-widest text-ink-subtle">
-               Talents System Cartridge
-             </span>
-          </div>
-          <h2 className="font-display text-2xl font-bold text-ink">Your first flow</h2>
-          <p className="mt-4 font-sans text-sm leading-relaxed text-ink-muted">
+      <div className="relative mx-auto max-w-lg rounded-3xl border border-border-strong bg-surface/80 p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
+        <h2 className="font-display text-2xl font-semibold text-ink">Your first flow</h2>
+          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
             A flow splits a deposit the moment it arrives, by percentages you
             set — so a lean month needs no re-planning, and money is set aside
             before you can spend it.
           </p>
-          <p className="mt-3 font-sans text-sm leading-relaxed text-ink-muted">
+          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
             Flows aren&apos;t connected to the banking service yet, so there is
             nothing here to show. Switch to sample data to see a worked example.
           </p>
-        </div>
       </div>
     );
   }
 
   return (
-    <div className="relative flex flex-col rounded-t-xl rounded-b-md border-4 border-border-strong bg-surface-sunk p-2 shadow-card max-w-lg mx-auto">
-      <div className="mb-3 mt-1 flex justify-center gap-1.5 opacity-50" aria-hidden>
-        <div className="h-2 w-8 rounded-full bg-border-strong shadow-inner"></div>
-        <div className="h-2 w-8 rounded-full bg-border-strong shadow-inner"></div>
-        <div className="h-2 w-8 rounded-full bg-border-strong shadow-inner"></div>
-      </div>
-      <div className="relative flex-1 rounded-md border-2 border-border-strong bg-surface p-7 shadow-sm">
-        <div className="mb-4 border-b-2 border-border pb-2">
-           <span className="font-display text-[10px] uppercase tracking-widest text-ink-subtle">
-             Talents System Cartridge
-           </span>
-        </div>
-        <h2 className="font-display text-2xl font-bold text-ink">Your first flow</h2>
-        <p className="mt-4 font-sans text-sm leading-relaxed text-ink-muted">
+    <div className="relative mx-auto max-w-lg rounded-3xl border border-border-strong bg-surface/80 p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
+      <h2 className="font-display text-2xl font-semibold text-ink">Your first flow</h2>
+        <p className="mt-3 text-sm leading-relaxed text-ink-muted">
           Say Northwind pays you $6,125. Instead of it all landing in one place
           and hoping some survives the month, a flow splits it the moment it
           arrives:
         </p>
 
-        <ul className="mt-5 flex flex-col gap-2 font-sans text-sm">
+        <ul className="mt-4 flex flex-col gap-2 text-sm">
           {[
             ["20%", "Safety net", "$1,225"],
             ["25%", "Career break", "$1,531"],
@@ -101,31 +78,28 @@ function FlowsEmptyState({ sample }: { sample: boolean }) {
           ].map(([share, where, amount]) => (
             <li
               key={where}
-              className="flex items-baseline justify-between gap-3 border-b-2 border-border pb-2"
+              className="flex items-baseline justify-between gap-3 border-b border-border pb-2"
             >
-              <span className="text-ink font-bold">
-                <span className="font-numbers text-base">{share}</span> to {where}
+              <span className="text-ink">
+                <span className="font-medium tabular">{share}</span> to {where}
               </span>
-              <span className="font-numbers text-base font-bold text-ink-muted">{amount}</span>
+              <span className="tabular text-ink-muted">{amount}</span>
             </li>
           ))}
         </ul>
 
-        <p className="mt-5 font-sans text-sm leading-relaxed text-ink-muted">
+        <p className="mt-4 text-sm leading-relaxed text-ink-muted">
           Next month the invoice is smaller? The shares stay the same, so nothing
           needs adjusting.
         </p>
 
-        <div className="mt-6 border-t-2 border-border pt-5">
-          <Link
-            href="/flows/new"
-            className={buttonVariants({ variant: "primary", size: "md" })}
-          >
-            <Plus className="size-4" aria-hidden />
-            Insert Coin to Build
-          </Link>
-        </div>
-      </div>
+        <Link
+          href="/flows/new"
+          className={buttonVariants({ variant: "primary", size: "md", className: "mt-5" })}
+        >
+          <Plus className="size-4" aria-hidden />
+          Build a flow
+        </Link>
     </div>
   );
 }

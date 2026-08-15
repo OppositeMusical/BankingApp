@@ -16,33 +16,33 @@
  * See docs/branding-identity-v2.md for the full spec.
  * ------------------------------------------------------------------------- */
 :root {
-  --bg: #0a0a0a; /* cabinet black */
-  --surface: #141414; /* screen bezel — raised cards */
-  --surface-sunk: #0d0d0d; /* coin slot shadow — wells, inset rows */
+  --bg: #09090b; /* deep gunmetal */
+  --surface: #141417; /* machined surface */
+  --surface-sunk: #000000; /* deep inset */
 
-  --ink: #f0e6d3; /* ~16:1 on bg — warm white with gold cast */
-  --ink-muted: #a89a84; /*  ~7.5:1 on bg — faded gold */
-  --ink-subtle: #7a7060; /*  ~5:1 on bg — dimmed marquee */
+  --ink: #f4f4f5; /* clean white */
+  --ink-muted: #a1a1aa; /* metallic grey */
+  --ink-subtle: #71717a; /* dim grey */
 
-  --border: #2a2520; /* dark bronze edge */
-  --border-strong: #5c5040; /* ~3:1 on bg — visible bronze line */
+  --border: #27272a; /* machined edge */
+  --border-strong: #3f3f46; /* highlighted edge */
 
-  --accent: #d4a843; /* coin gold */
-  --accent-hover: #e0b84f; /* brighter gold — coin catching the light */
-  --accent-soft: #1f1a10; /* dim glow behind glass */
-  --accent-on: #0a0a0a; /* black text on gold surfaces */
+  --accent: #d4af37; /* polished gold */
+  --accent-hover: #e5c158; /* catching light */
+  --accent-soft: #272111; /* dim gold reflection */
+  --accent-on: #000000;
 
-  --positive: #39e075; /* neon green — money in, score going up */
-  --negative: #e0a030; /* amber — money out, cabinet caution light */
-  --alert: #ff4060; /* hot pink — "GAME OVER" flash, real alarms only */
+  --positive: #10b981;
+  --negative: #f59e0b;
+  --alert: #ef4444;
 
   --positive-soft: #0d1f12;
   --negative-soft: #1f1808;
   --alert-soft: #1f0a10;
 
-  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
-  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.5);
-  --shadow-lg: 0 12px 32px -8px rgb(0 0 0 / 0.6);
+  --shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.8);
+  --shadow-md: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.9);
+  --shadow-lg: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 12px 32px -8px rgba(0, 0, 0, 0.95);
 
   /* Data-mark colors — coin gold for spending, neon green for earning.
      Validated for CVD separation and contrast against the dark surface. */
@@ -142,28 +142,20 @@
   --color-tape: var(--tape);
   --color-thread: var(--thread);
 
-  --font-hand: var(--font-press-start), ui-monospace, monospace;
-  --font-arcade: var(--font-press-start), ui-monospace, monospace;
-  --font-sans: var(--font-vt323), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-silkscreen), ui-monospace, monospace;
-  --font-numbers: var(--font-orbitron), ui-sans-serif, system-ui, sans-serif;
+  --font-hand: var(--font-caveat), cursive;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-numbers: var(--font-jetbrains-mono), ui-monospace, monospace;
 
-  --radius-card: 0px;
-  --radius-field: 0px;
-  --radius-pill: 0px;
+  --radius-card: 16px;
+  --radius-field: 8px;
+  --radius-pill: 9999px;
 
-  --shadow-card: 2px 2px 0px var(--border-strong);
-  --shadow-raised: 4px 4px 0px var(--border-strong);
-  --shadow-float: 8px 8px 0px var(--border-strong);
+  --shadow-card: var(--shadow-sm);
+  --shadow-raised: var(--shadow-md);
+  --shadow-float: var(--shadow-lg);
 
-  --ease-out: steps(4, end);
-
-  /* Bump up all text sizes because VT323 naturally renders quite small */
-  --text-xs: 0.875rem;
-  --text-sm: 1rem;
-  --text-base: 1.125rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.5rem;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {
@@ -187,28 +179,6 @@
     outline: 2px solid var(--accent);
     outline-offset: 2px;
     border-radius: 4px;
-  }
-
-  /* Chunky Arcade Scrollbars */
-  ::-webkit-scrollbar {
-    width: 16px;
-    height: 16px;
-  }
-  ::-webkit-scrollbar-track {
-    background: var(--bg);
-    border-left: 2px solid var(--border-strong);
-    border-top: 2px solid var(--border-strong);
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--accent);
-    border: 2px solid var(--border-strong);
-    border-radius: 0;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--accent-hover);
-  }
-  ::-webkit-scrollbar-corner {
-    background: var(--bg);
   }
 
   /* Money and any aligned figures use tabular lining numerals so columns
@@ -243,41 +213,7 @@
  * target, or puts text on a texture.
  * ------------------------------------------------------------------------- */
 @layer components {
-  /* A sheet of paper with a subtly irregular, hand-cut edge. */
-  .paper {
-    background-color: var(--paper);
-    border: 2px solid var(--paper-edge);
-    border-radius: 0px;
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.04),
-      var(--shadow-raised);
-  }
-  [data-theme="dark"] .paper {
-    box-shadow:
-      inset 0 1px 0 rgb(255 255 255 / 0.04),
-      var(--shadow-raised);
-  }
 
-  /* One tape strip per card. Decorative only, so it is inert and hidden from
-     assistive tech and from forced-colors. */
-  .taped::before {
-    content: "";
-    position: absolute;
-    top: -9px;
-    left: 22px;
-    width: 76px;
-    height: 21px;
-    background: color-mix(in srgb, var(--tape) 78%, transparent);
-    border-left: 1px solid rgb(255 255 255 / 0.18);
-    border-right: 1px solid rgb(0 0 0 / 0.05);
-    transform: rotate(-4deg);
-    pointer-events: none;
-  }
-  /* Peeled corner reads as "set aside for now" — used for paused flows. */
-  .taped-peeled::before {
-    transform: rotate(-13deg) translateY(-2px);
-    opacity: 0.7;
-  }
 
   /* React Flow, restyled onto our tokens. The library ships a developer-tool
      look by default; these overrides make the canvas part of the scrapbook. */
@@ -342,41 +278,8 @@
   }
 }
 
-@layer utilities {
-  /* Tilt is a transform: it never moves layout or changes a hit target, and it
-     is never applied to something interactive. Capped at 1.5deg. */
-  .tilt-a {
-    transform: rotate(-1.2deg);
-  }
-  .tilt-b {
-    transform: rotate(0.9deg);
-  }
 
-  /* One low-opacity grain layer per screen, behind the cards. */
-  .grain::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: var(--grain);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-}
 
-/* The decoration is the first thing to go when the display can't afford it. */
-@media (forced-colors: active) {
-  .taped::before,
-  .grain::after {
-    display: none;
-  }
-  .tilt-a,
-  .tilt-b {
-    transform: none;
-  }
-  .paper {
-    border-radius: 12px;
-  }
-}
 
 /* Honor the OS-level reduced-motion setting everywhere, including any
    animation added later. */

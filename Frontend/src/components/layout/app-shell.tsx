@@ -33,9 +33,8 @@ export function AppShell({
       </a>
 
       {/* Desktop sidebar */}
-      {/* Above the sticky header (z-30) so the header's translucent backdrop
-          doesn't wash over the sidebar's top edge. */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-border bg-surface px-4 py-6 lg:flex">
+      {/* Floating glass panel rather than a full-bleed basic sidebar. */}
+      <aside className="fixed inset-y-4 left-4 z-40 hidden w-64 flex-col rounded-3xl border border-border bg-surface/80 px-4 py-6 shadow-float backdrop-blur-2xl lg:flex">
         <Link
           href="/dashboard"
           className="mb-8 flex items-center gap-2.5 px-2 rounded-field"
@@ -56,12 +55,12 @@ export function AppShell({
                 "flex items-center gap-3 rounded-field px-3 py-2.5 text-sm font-medium",
                 "transition-colors duration-150 ease-[var(--ease-out)]",
                 isActive(href)
-                  ? "bg-accent-soft text-accent"
-                  : "text-ink-muted hover:bg-surface-sunk hover:text-ink",
+                  ? "bg-gradient-to-r from-accent-soft to-transparent text-accent shadow-[inset_2px_0_0_var(--color-accent)]"
+                  : "text-ink-muted hover:bg-white/5 hover:text-ink",
               )}
             >
               <Icon
-                className="size-[20px] shrink-0 drop-shadow-[2px_2px_0px_var(--color-border-strong)]"
+                className="size-[20px] shrink-0"
                 strokeWidth={2.5}
                 aria-hidden
               />
@@ -80,8 +79,8 @@ export function AppShell({
       </aside>
 
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-border bg-bg/85 backdrop-blur-md lg:pl-64">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 px-4 sm:px-6">
+      <header className="sticky top-4 z-30 mx-4 lg:pl-[17rem]">
+        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 rounded-full border border-border bg-surface/80 px-4 shadow-float backdrop-blur-2xl sm:px-6">
           <Link href="/dashboard" className="flex items-center gap-2 lg:hidden">
             <TalentsMark />
             <span className="font-display text-lg font-semibold">Talents</span>
@@ -112,7 +111,7 @@ export function AppShell({
 
       <main
         id="main"
-        className="mx-auto max-w-5xl px-4 pb-28 pt-6 sm:px-6 lg:pb-16 lg:pl-64"
+        className="mx-auto max-w-5xl px-4 pb-28 pt-8 sm:px-6 lg:pb-16 lg:pl-[17rem]"
       >
         <div className="lg:pl-6">{children}</div>
       </main>
@@ -120,7 +119,7 @@ export function AppShell({
       {/* Mobile tab bar */}
       <nav
         aria-label="Main"
-        className="fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur-md lg:hidden"
+        className="fixed inset-x-4 bottom-4 z-30 rounded-full border border-border bg-surface/90 shadow-float backdrop-blur-2xl lg:hidden"
       >
         <ul className="mx-auto flex max-w-lg items-stretch justify-around px-2 pb-[env(safe-area-inset-bottom)]">
           {mobileNavItems.map(({ href, label, icon: Icon }) => (
@@ -134,7 +133,7 @@ export function AppShell({
                 )}
               >
                 <Icon
-                  className="size-5 drop-shadow-[2px_2px_0px_var(--color-border-strong)]"
+                  className="size-5"
                   strokeWidth={2.5}
                   aria-hidden
                 />

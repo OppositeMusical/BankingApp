@@ -35,7 +35,7 @@ export function FlowCard({ flow, tilt }: { flow: Flow; tilt: "a" | "b" }) {
   return (
     <div
       className={cn(
-        "relative flex flex-col rounded-t-xl rounded-b-md border-4 border-border-strong bg-surface-sunk p-2 shadow-card transition-transform hover:-translate-y-1",
+        "relative rounded-2xl border border-border-strong bg-surface shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_8px_24px_rgba(0,0,0,0.6)] backdrop-blur-xl transition-transform hover:-translate-y-1",
         state === "paused" && "opacity-80 saturate-50",
       )}
     >
@@ -43,33 +43,19 @@ export function FlowCard({ flow, tilt }: { flow: Flow; tilt: "a" | "b" }) {
         {announcement}
       </p>
 
-      {/* Cartridge Grip / Ridges */}
-      <div className="mb-3 mt-1 flex justify-center gap-1.5 opacity-50" aria-hidden>
-        <div className="h-2 w-8 rounded-full bg-border-strong shadow-inner"></div>
-        <div className="h-2 w-8 rounded-full bg-border-strong shadow-inner"></div>
-        <div className="h-2 w-8 rounded-full bg-border-strong shadow-inner"></div>
-      </div>
-
-      {/* Cartridge Sticker (Label) */}
       <article
         className={cn(
-          "relative flex-1 rounded-md border-2 border-border-strong bg-surface p-4 shadow-sm",
-          state === "needs-attention" && "border-alert bg-alert-soft/20",
+          "relative p-6",
+          state === "needs-attention" && "rounded-2xl border border-alert/50 bg-alert-soft/20",
         )}
       >
-        <div className="mb-2 border-b-2 border-border pb-2">
-           <span className="font-display text-[10px] uppercase tracking-widest text-ink-subtle">
-             Talents System Cartridge
-           </span>
-        </div>
-
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            {/* Display font instead of hand font for the cartridge title */}
-            <h3 className="font-display text-xl leading-tight text-ink">
+            {/* Clean metallic display typography instead of handwriting */}
+            <h3 className="font-display text-xl font-semibold leading-tight text-ink">
               {flow.name}
             </h3>
-            <p className="mt-1 font-numbers text-sm leading-relaxed text-ink-subtle">
+            <p className="mt-1 text-xs font-medium uppercase tracking-wider text-ink-subtle">
               {flow.source.displayName} · {describeCadence(flow.source.cadence)}
             </p>
           </div>
@@ -78,7 +64,7 @@ export function FlowCard({ flow, tilt }: { flow: Flow; tilt: "a" | "b" }) {
 
         {/* The split, drawn. The deposit is the diagram's source node, so it
             isn't also stated as a line of prose above it. */}
-        <div className="mt-5">
+        <div className="mt-4">
           <FlowGraph
             splits={flow.splits}
             typicalAmount={flow.source.typicalAmount}
@@ -88,17 +74,17 @@ export function FlowCard({ flow, tilt }: { flow: Flow; tilt: "a" | "b" }) {
         </div>
 
         {state === "needs-attention" && flow.attentionReason && (
-          <p className="mt-4 rounded-field border-2 border-alert bg-alert-soft px-3 py-2 font-sans text-xs leading-relaxed text-alert">
+          <p className="mt-4 rounded-field bg-alert-soft px-4 py-3 text-sm font-medium leading-relaxed text-alert border border-alert/30">
             {flow.attentionReason}
           </p>
         )}
 
-        <div className="mt-5 flex items-center justify-between gap-3 border-t-2 border-border pt-4">
+        <div className="mt-5 flex items-center justify-between gap-3 border-t border-border pt-4">
           <Link
             href={`/flows/${flow.id}`}
-            className={buttonVariants({ variant: "primary", size: "sm" })}
+            className={buttonVariants({ variant: "ghost", size: "sm" })}
           >
-            Play
+            Open
             <ArrowRight className="size-3.5" aria-hidden />
           </Link>
 
@@ -108,7 +94,7 @@ export function FlowCard({ flow, tilt }: { flow: Flow; tilt: "a" | "b" }) {
             <button
               type="button"
               onClick={togglePause}
-              className="inline-flex h-9 items-center gap-1.5 rounded-field border-2 border-border-strong bg-surface px-3 text-sm font-bold text-ink transition-colors hover:bg-surface-sunk shadow-sm"
+              className={buttonVariants({ variant: "secondary", size: "sm" })}
             >
               {state === "paused" ? (
                 <>
