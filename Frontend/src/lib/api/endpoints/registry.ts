@@ -59,14 +59,13 @@ export type LiveOperation = (typeof liveOperations)[number];
  * Everything in the contract that Go has not implemented. Listed explicitly so
  * the gap is visible in code review rather than inferred from an absence.
  */
-/**
- * Nothing is pending: the Go API now serves every operation the UI calls.
- *
- * Kept as an empty tuple rather than deleted — `resolve()` and its tests are
- * written around the distinction, and the next unimplemented endpoint has a
- * place to go.
- */
-export const pendingOperations = [] as const;
+/** Operations the contract does not serve yet. */
+export const pendingOperations = [
+  // Real portfolio value over time. Until this exists the chart approximates
+  // it from today's quantities, which is not the same question — see
+  // lib/market/portfolio.ts and docs/backend-portfolio-history.md.
+  "brokerage.portfolioHistory",
+] as const;
 
 export type PendingOperation = (typeof pendingOperations)[number];
 

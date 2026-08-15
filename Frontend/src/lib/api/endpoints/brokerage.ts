@@ -66,7 +66,38 @@ export type Order = {
   createdAt: string;
 };
 
+/** One point on the account's real value curve. */
+export type PortfolioPoint = { at: string; value: number };
+
+const PortfolioHistorySchema = z.object({
+  points: z.array(z.object({ at: z.string(), value: MoneySchema })),
+});
+
 export const brokerageApi = {
+  /**
+   * The account's actual value over time.
+   *
+   * Returns null until the backend serves it, which is the signal for the
+   * chart to fall back to approximating from today's holdings — and to say so.
+   * The two answer different questions: this one accounts for what was bought
+   * and sold along the way.
+   */
+  portfolioHistory: (range: string): Promise<PortfolioPoint[] | null> =>
+    resolve("brokerage.portfolioHistory", {
+      live: async () => {
+        const data = await apiFetch("/brokerage/portfolio/history", {
+          query: { range },
+          schema: PortfolioHistorySchema,
+        });
+        return data.points.map((point) => ({
+          at: point.at,
+          value: point.value.amount / 100,
+        }));
+      },
+      fixture: () => null,
+      empty: () => null,
+    }),
+
   /** The account, or null when the user has not opened one. */
   account: (): Promise<BrokerageAccount | null> =>
     resolve("brokerage.account", {

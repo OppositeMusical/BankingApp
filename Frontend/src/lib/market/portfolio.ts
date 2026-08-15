@@ -62,3 +62,34 @@ export function portfolioSeries(
     times,
   };
 }
+
+
+/**
+ * Real portfolio history, as a Quote.
+ *
+ * The genuine article: values that already account for what was bought and
+ * sold along the way. Shaped like a Quote purely so it feeds the same chart.
+ */
+export function historySeries(
+  points: { at: string; value: number }[],
+  currency = "USD",
+): Quote | null {
+  if (points.length < 2) return null;
+
+  const values = points.map((point) => point.value);
+  const price = values[values.length - 1];
+  const previousClose = values[0];
+
+  return {
+    symbol: "Portfolio",
+    price,
+    previousClose,
+    change: price - previousClose,
+    changePercent: previousClose
+      ? ((price - previousClose) / previousClose) * 100
+      : 0,
+    currency,
+    points: values,
+    times: points.map((point) => Math.floor(Date.parse(point.at) / 1000)),
+  };
+}

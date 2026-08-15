@@ -6,7 +6,8 @@ import { PriceChart } from "@/components/charts/price-chart";
 import { Sparkline } from "@/components/charts/sparkline";
 import { Card, CardBody } from "@/components/ui/card";
 import { StockSearchDialog } from "./stock-search-dialog";
-import { portfolioSeries } from "@/lib/market/portfolio";
+import { historySeries, portfolioSeries } from "@/lib/market/portfolio";
+import { brokerageApi } from "@/lib/api";
 import type { Quote, Range } from "@/lib/market/quotes";
 import type { Holding } from "@/lib/api/endpoints/brokerage";
 import { cn } from "@/lib/utils/cn";
@@ -45,6 +46,27 @@ export function MarketPanel({
   const [range, setRange] = useState<Range>("1mo");
   const [quotes, setQuotes] = useState(initialQuotes);
   const [searchOpen, setSearchOpen] = useState(false);
+  // Real value history when the backend serves it; null means fall back.
+  const [history, setHistory] = useState<
+    { at: string; value: number }[] | null
+  >(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    brokerageApi
+      .portfolioHistory(range)
+      .then((points) => {
+        if (!cancelled) setHistory(points);
+      })
+      .catch(() => {
+        // An unavailable history is the fallback case, not an error worth
+        // showing — the approximation below still charts something true.
+        if (!cancelled) setHistory(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [range]);
 
   // The server rendered 1mo; any other range is a client concern.
   useEffect(() => {
@@ -70,10 +92,19 @@ export function MarketPanel({
   }, [range, initialQuotes]);
 
   const shown = range === "1mo" ? initialQuotes : quotes;
-  const portfolio = useMemo(
+
+  // Real history wins. The approximation is only ever a stand-in, and the
+  // caption below changes with it so the chart never overstates what it knows.
+  const real = useMemo(
+    () => (history ? historySeries(history) : null),
+    [history],
+  );
+  const approximated = useMemo(
     () => portfolioSeries(holdings, shown),
     [holdings, shown],
   );
+  const portfolio = real ?? approximated;
+  const isApproximate = real === null && approximated !== null;
 
   return (
     <>
@@ -141,12 +172,19 @@ export function MarketPanel({
 
                 <PriceChart quote={portfolio} />
 
-                <p className="mt-2 text-xs text-ink-subtle">
-                  What you hold today, valued back through this period — not a
-                  record of what the account was worth then. Position history
-                  isn&apos;t published, so buys and sales part-way through
-                  aren&apos;t reflected.
-                </p>
+                {isApproximate ? (
+                  <p className="mt-2 text-xs text-ink-subtle">
+                    Approximate: what you hold today, valued back through this
+                    period. Not a record of what the account was worth then —
+                    buys and sales part-way through aren&apos;t reflected,
+                    because the API doesn&apos;t publish value history yet.
+                  </p>
+                ) : (
+                  <p className="mt-2 text-xs text-ink-subtle">
+                    The account&apos;s value over time, including what was
+                    bought and sold along the way.
+                  </p>
+                )}
               </>
             ) : (
               <p className="py-6 text-center text-sm text-ink-muted">
