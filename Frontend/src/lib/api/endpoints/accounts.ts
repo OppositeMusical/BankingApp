@@ -111,6 +111,33 @@ export const accountsApi = {
       fixture: () => withLatency(accountFixtures),
     }),
 
+  /**
+   * Open a sub-account.
+   *
+   * Created empty: it starts at zero and is funded by a transfer like anything
+   * else, which keeps opening one off the money path entirely.
+   */
+  createSubAccount: (
+    bankAccountId: string,
+    label: string,
+  ): Promise<Account | undefined> =>
+    resolve("accounts.subAccounts", {
+      scopedTo: bankAccountId,
+      live: async () => {
+        const { subAccount } = await apiFetch(
+          `/accounts/${bankAccountId}/sub-accounts`,
+          {
+            method: "POST",
+            body: { label },
+            schema: oneOf("subAccount", SubAccountSchema),
+          },
+        );
+        return toAccount(subAccount, { parentAccountId: bankAccountId });
+      },
+      fixture: () => undefined,
+      empty: () => undefined,
+    }),
+
   get: (id: string): Promise<Account | undefined> =>
     accountsApi
       .list()

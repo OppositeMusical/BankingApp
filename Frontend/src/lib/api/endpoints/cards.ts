@@ -36,13 +36,31 @@ const toCard = (wire: WireCard): Card => {
 };
 
 export const cardsApi = {
-  issue: (accountId: string, subAccountId?: string): Promise<Card | undefined> =>
+  /**
+   * Issue a card.
+   *
+   * `subAccountId` decides what it spends from. Without one the card draws on
+   * the bank account itself — which is a real choice, not a default, so the UI
+   * asks rather than assuming.
+   */
+  issue: (options: {
+    accountId: string;
+    subAccountId?: string;
+    perTransactionLimit?: number;
+  }): Promise<Card | undefined> =>
     resolve("cards.create", {
-      scopedTo: accountId,
+      scopedTo: options.accountId,
       live: async () => {
         const { card } = await apiFetch("/cards", {
           method: "POST",
-          body: { accountId, subAccountId, type: "debit" },
+          body: {
+            accountId: options.accountId,
+            subAccountId: options.subAccountId,
+            type: "debit",
+            ...(options.perTransactionLimit
+              ? { controls: { perTransactionLimit: options.perTransactionLimit } }
+              : {}),
+          },
           schema: CardResponse,
         });
         return toCard(card);

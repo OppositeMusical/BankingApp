@@ -23,9 +23,6 @@ export default async function SecurityPage() {
     cardsApi.list(),
     accountsApi.list(),
   ]);
-  // Cards are issued against the container account, not a pot.
-  const cardAccountId =
-    accounts[0]?.parentAccountId ?? accounts[0]?.id ?? "";
   const accountNames = Object.fromEntries(
     accounts.map((account) => [account.id, account.name]),
   );
@@ -48,7 +45,7 @@ export default async function SecurityPage() {
             No cards have been issued on this account.
           </NoData>
         )}
-        {!sample && cardAccountId && <IssueCard accountId={cardAccountId} />}
+        {!sample && accounts.length > 0 && <IssueCard accounts={accounts} />}
       </section>
 
       <section className="mb-6">

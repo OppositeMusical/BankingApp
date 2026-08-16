@@ -1,5 +1,6 @@
 import { AccountCarousel } from "@/components/banking/account-carousel";
 import { LinkedAccounts } from "./linked-accounts";
+import { NewSubAccount } from "./new-sub-account";
 import { PageHeader } from "@/components/layout/page-header";
 import { Explainer } from "@/components/banking/explainer";
 import { Card, CardBody } from "@/components/ui/card";
@@ -41,19 +42,29 @@ export default async function AccountsPage() {
         </section>
       )}
 
-      {subAccounts.length > 0 && (
+      {bankAccounts.length > 0 && (
         <section aria-labelledby="pots-heading" className="mb-8">
-          <h2
-            id="pots-heading"
-            className="mb-1 font-display text-xl font-semibold text-ink"
-          >
-            Set aside
-          </h2>
+          <div className="mb-1 flex flex-wrap items-center justify-between gap-3">
+            <h2
+              id="pots-heading"
+              className="font-display text-xl font-semibold text-ink"
+            >
+              Set aside
+            </h2>
+            <NewSubAccount bankAccounts={bankAccounts} />
+          </div>
           <p className="mb-3 max-w-prose text-sm text-ink-muted">
             Divisions of the account above. Each keeps its own balance and can
             hold its own card, but they share one account number.
           </p>
-          <AccountCarousel accounts={subAccounts} />
+          {subAccounts.length > 0 ? (
+            <AccountCarousel accounts={subAccounts} />
+          ) : (
+            <p className="text-sm text-ink-muted">
+              None yet. Opening one gives a name and a balance to a slice of the
+              account above.
+            </p>
+          )}
         </section>
       )}
 
