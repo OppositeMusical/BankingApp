@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowLeftRight } from "lucide-react";
 import { mobileNavItems, navItems } from "./nav-items";
-import { PrivacyToggle, ThemeToggle } from "./preference-toggles";
+import { PrivacyToggle } from "./preference-toggles";
 import { cn } from "@/lib/utils/cn";
 import type { ApiMode } from "@/lib/api/config";
 import type { Person } from "@/lib/types/banking";
@@ -32,94 +32,103 @@ export function AppShell({
         Skip to content
       </a>
 
-      {/* Desktop sidebar */}
-      {/* Floating glass panel rather than a full-bleed basic sidebar. */}
-      <aside className="fixed inset-y-4 left-4 z-40 hidden w-64 flex-col rounded-3xl border border-border bg-surface/80 px-4 py-6 shadow-float backdrop-blur-2xl lg:flex">
+      {/* Desktop sidebar — edge-to-edge, ultra-minimal */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-60 flex-col border-r border-white/[0.04] bg-black/40 px-5 py-8 backdrop-blur-2xl lg:flex">
+        {/* Brand */}
         <Link
           href="/dashboard"
-          className="mb-8 flex items-center gap-2.5 px-2 rounded-field"
+          className="mb-10 flex items-center gap-2.5 px-1"
         >
-          <TalentsMark />
-          <span className="font-display text-xl font-semibold tracking-tight">
+          <TalentsMark className="size-6" />
+          <span className="font-display text-lg font-semibold tracking-tight text-ink">
             Talents
           </span>
         </Link>
 
-        <nav aria-label="Main" className="flex flex-1 flex-col gap-1">
-          {navItems.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={href}
-              href={href}
-              aria-current={isActive(href) ? "page" : undefined}
-              className={cn(
-                "flex items-center gap-3 rounded-field px-3 py-2.5 text-sm font-medium",
-                "transition-colors duration-150 ease-[var(--ease-out)]",
-                isActive(href)
-                  ? "bg-gradient-to-r from-accent-soft to-transparent text-accent shadow-[inset_2px_0_0_var(--color-accent)]"
-                  : "text-ink-muted hover:bg-white/5 hover:text-ink",
-              )}
-            >
-              <Icon
-                className="size-[20px] shrink-0"
-                strokeWidth={2.5}
-                aria-hidden
-              />
-              {label}
-            </Link>
-          ))}
+        {/* Navigation */}
+        <nav aria-label="Main" className="flex-1">
+          <ul className="space-y-0.5">
+            {navItems.map(({ href, label, icon: Icon }) => (
+              <li key={href}>
+                <Link
+                  href={href}
+                  aria-current={isActive(href) ? "page" : undefined}
+                  className={cn(
+                    "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] tracking-wide",
+                    "transition-all duration-200",
+                    isActive(href)
+                      ? "text-white"
+                      : "text-zinc-500 hover:text-zinc-300",
+                  )}
+                >
+                  {/* Active dot indicator */}
+                  {isActive(href) && (
+                    <span className="absolute left-0 top-1/2 h-4 w-[2px] -translate-y-1/2 rounded-full bg-accent shadow-[0_0_8px_var(--color-accent)]" />
+                  )}
+                  <Icon
+                    className={cn(
+                      "size-[18px] shrink-0 transition-colors duration-200",
+                      isActive(href) ? "text-accent" : "text-zinc-600 group-hover:text-zinc-400",
+                    )}
+                    strokeWidth={1.8}
+                    aria-hidden
+                  />
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </nav>
 
-        <Link
-          href="/transfer"
-          className="mt-4 flex h-11 items-center justify-center gap-2 rounded-field bg-accent px-4 text-sm font-medium text-accent-on shadow-card transition-colors hover:bg-accent-hover"
-        >
-          <ArrowLeftRight className="size-4" aria-hidden />
-          Move money
-        </Link>
+        {/* Footer */}
+        <div className="mt-auto space-y-4">
+          <div className="flex items-center gap-2 px-1">
+            <DataSourceBadge mode={mode} />
+            <div className="ml-auto">
+              <PrivacyToggle />
+            </div>
+          </div>
+          <div className="h-px bg-white/[0.04]" />
+          <Link
+            href="/settings"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-[13px] text-zinc-500 transition-colors hover:text-zinc-300"
+          >
+            <div className="flex size-7 items-center justify-center rounded-full bg-accent/15 text-[11px] font-semibold text-accent">
+              {person.displayName.charAt(0)}
+            </div>
+            <span className="tracking-wide">{person.displayName}</span>
+          </Link>
+        </div>
       </aside>
 
-      {/* Header */}
-      <header className="sticky top-4 z-30 mx-4 lg:pl-[17rem]">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-4 rounded-full border border-border bg-surface/80 px-4 shadow-float backdrop-blur-2xl sm:px-6">
-          <Link href="/dashboard" className="flex items-center gap-2 lg:hidden">
-            <TalentsMark />
-            <span className="font-display text-lg font-semibold">Talents</span>
+      {/* Mobile Header */}
+      <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-white/5 bg-surface/80 px-4 backdrop-blur-2xl lg:hidden">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <TalentsMark />
+          <span className="font-display text-lg font-semibold">Talents</span>
+        </Link>
+        <div className="flex items-center gap-2">
+          <PrivacyToggle />
+          <Link
+            href="/settings"
+            className="flex size-8 items-center justify-center rounded-full bg-accent-soft text-xs font-semibold text-accent shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)]"
+          >
+            {person.displayName.charAt(0)}
           </Link>
-
-          <p className="hidden text-sm text-ink-muted lg:block">
-            Signed in as{" "}
-            <span className="font-medium text-ink">
-              {person.displayName}
-            </span>
-          </p>
-
-          <div className="flex items-center gap-1">
-            <DataSourceBadge mode={mode} />
-            <PrivacyToggle />
-            <ThemeToggle />
-            <Link
-              href="/settings"
-              className="ml-1 flex size-11 items-center justify-center rounded-pill bg-accent-soft text-sm font-semibold text-accent"
-              title="Profile and settings"
-            >
-              <span aria-hidden>{person.displayName.charAt(0)}</span>
-              <span className="sr-only">Profile and settings</span>
-            </Link>
-          </div>
         </div>
       </header>
 
       <main
         id="main"
-        className="mx-auto max-w-5xl px-4 pb-28 pt-8 sm:px-6 lg:pb-16 lg:pl-[17rem]"
+        className="mx-auto w-full max-w-5xl px-4 pb-24 pt-6 lg:pl-72 lg:pr-8 lg:pb-12 lg:pt-12"
       >
-        <div className="lg:pl-6">{children}</div>
+        {children}
       </main>
 
       {/* Mobile tab bar */}
       <nav
         aria-label="Main"
-        className="fixed inset-x-4 bottom-4 z-30 rounded-full border border-border bg-surface/90 shadow-float backdrop-blur-2xl lg:hidden"
+        className="fixed inset-x-4 bottom-4 z-30 rounded-full border border-white/5 bg-white/[0.02] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-3xl lg:hidden"
       >
         <ul className="mx-auto flex max-w-lg items-stretch justify-around px-2 pb-[env(safe-area-inset-bottom)]">
           {mobileNavItems.map(({ href, label, icon: Icon }) => (
@@ -183,11 +192,14 @@ function DataSourceBadge({ mode }: { mode: ApiMode }) {
   );
 }
 
-function TalentsMark() {
+function TalentsMark({ className }: { className?: string }) {
   return (
     <span
       aria-hidden
-      className="grid size-8 place-items-center rounded-[10px] bg-accent text-accent-on"
+      className={cn(
+        "grid place-items-center rounded-[10px] bg-accent text-accent-on",
+        className || "size-8"
+      )}
     >
       <svg viewBox="0 0 24 24" className="size-4.5" fill="none">
         <path

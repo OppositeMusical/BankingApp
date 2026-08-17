@@ -22,7 +22,7 @@ export function StatTile({
   return (
     <div
       className={cn(
-        "rounded-card border border-border bg-surface px-4 py-3.5 shadow-card",
+        "rounded-3xl border border-white/5 bg-white/[0.02] px-4 py-4 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_4px_16px_rgba(0,0,0,0.4)] backdrop-blur-2xl",
         className,
       )}
     >

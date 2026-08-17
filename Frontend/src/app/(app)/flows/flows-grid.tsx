@@ -45,7 +45,7 @@ function FlowsEmptyState({ sample }: { sample: boolean }) {
   // balance somebody owns.
   if (!sample) {
     return (
-      <div className="relative mx-auto max-w-lg rounded-3xl border border-border-strong bg-surface/80 p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
+      <div className="relative mx-auto max-w-lg rounded-3xl border border-white/5 bg-white/[0.02] p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-3xl transition-all hover:bg-white/[0.04]">
         <h2 className="font-display text-2xl font-semibold text-ink">Your first flow</h2>
           <p className="mt-3 text-sm leading-relaxed text-ink-muted">
             A flow splits a deposit the moment it arrives, by percentages you
@@ -61,7 +61,7 @@ function FlowsEmptyState({ sample }: { sample: boolean }) {
   }
 
   return (
-    <div className="relative mx-auto max-w-lg rounded-3xl border border-border-strong bg-surface/80 p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
+    <div className="relative mx-auto max-w-lg rounded-3xl border border-white/5 bg-white/[0.02] p-8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_8px_32px_rgba(0,0,0,0.6)] backdrop-blur-3xl transition-all hover:bg-white/[0.04]">
       <h2 className="font-display text-2xl font-semibold text-ink">Your first flow</h2>
         <p className="mt-3 text-sm leading-relaxed text-ink-muted">
           Say Northwind pays you $6,125. Instead of it all landing in one place
@@ -78,7 +78,7 @@ function FlowsEmptyState({ sample }: { sample: boolean }) {
           ].map(([share, where, amount]) => (
             <li
               key={where}
-              className="flex items-baseline justify-between gap-3 border-b border-border pb-2"
+              className="flex items-baseline justify-between gap-3 border-b border-white/10 pb-2"
             >
               <span className="text-ink">
                 <span className="font-medium tabular">{share}</span> to {where}

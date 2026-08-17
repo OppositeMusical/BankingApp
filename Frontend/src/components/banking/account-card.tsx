@@ -15,7 +15,7 @@ export function AccountCard({ account }: { account: Account }) {
   return (
     <Link
       href={`/accounts/${account.id}`}
-      className="group block rounded-card border border-border bg-surface p-5 shadow-card transition-colors duration-150 hover:border-border-strong"
+      className="group block rounded-3xl border border-white/5 bg-white/[0.02] p-6 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_8px_24px_rgba(0,0,0,0.4)] backdrop-blur-2xl transition-all duration-300 hover:bg-white/[0.04] hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.08),0_12px_32px_rgba(0,0,0,0.6)]"
     >
       <div className="flex items-start justify-between gap-3">
         <div>

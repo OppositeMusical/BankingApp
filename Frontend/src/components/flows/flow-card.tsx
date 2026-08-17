@@ -35,7 +35,7 @@ export function FlowCard({ flow, tilt }: { flow: Flow; tilt: "a" | "b" }) {
   return (
     <div
       className={cn(
-        "relative rounded-2xl border border-border-strong bg-surface shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_8px_24px_rgba(0,0,0,0.6)] backdrop-blur-xl transition-transform hover:-translate-y-1",
+        "relative rounded-3xl border border-white/5 bg-white/[0.02] shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_8px_24px_rgba(0,0,0,0.4)] backdrop-blur-3xl transition-transform hover:-translate-y-1 hover:bg-white/[0.04]",
         state === "paused" && "opacity-80 saturate-50",
       )}
     >
@@ -46,7 +46,7 @@ export function FlowCard({ flow, tilt }: { flow: Flow; tilt: "a" | "b" }) {
       <article
         className={cn(
           "relative p-6",
-          state === "needs-attention" && "rounded-2xl border border-alert/50 bg-alert-soft/20",
+          state === "needs-attention" && "rounded-3xl border border-alert/30 bg-alert-soft/10",
         )}
       >
         <div className="flex items-start justify-between gap-3">
@@ -79,7 +79,7 @@ export function FlowCard({ flow, tilt }: { flow: Flow; tilt: "a" | "b" }) {
           </p>
         )}
 
-        <div className="mt-5 flex items-center justify-between gap-3 border-t border-border pt-4">
+        <div className="mt-5 flex items-center justify-between gap-3 border-t border-white/10 pt-4">
           <Link
             href={`/flows/${flow.id}`}
             className={buttonVariants({ variant: "ghost", size: "sm" })}

@@ -5,13 +5,13 @@ type Size = "sm" | "md" | "lg";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-gradient-to-b from-accent-hover to-accent text-accent-on shadow-[inset_0_1px_1px_rgba(255,255,255,0.5),0_2px_5px_rgba(0,0,0,0.5)] border border-[#a87f17] hover:brightness-110 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] active:brightness-95",
+    "bg-accent/90 backdrop-blur-md text-accent-on shadow-[inset_0_1px_1px_rgba(255,255,255,0.5),0_4px_12px_rgba(0,0,0,0.5)] border border-white/20 hover:bg-accent active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.3)] active:brightness-95",
   secondary:
-    "bg-gradient-to-b from-[#323236] to-[#1f1f22] text-ink shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_2px_5px_rgba(0,0,0,0.5)] border border-[#141417] hover:brightness-110 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] active:brightness-95",
+    "bg-white/5 backdrop-blur-md text-ink shadow-[inset_0_1px_1px_rgba(255,255,255,0.1),0_4px_12px_rgba(0,0,0,0.3)] border border-white/10 hover:bg-white/10 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] active:brightness-95",
   ghost:
     "text-ink-muted hover:bg-white/5 hover:text-ink hover:shadow-[inset_0_1px_1px_rgba(255,255,255,0.05),0_2px_5px_rgba(0,0,0,0.3)] active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.2)] active:bg-black/20",
   danger:
-    "bg-gradient-to-b from-alert to-[#c92a2a] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_2px_5px_rgba(0,0,0,0.5)] border border-[#8b1414] hover:brightness-110 active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] active:brightness-95",
+    "bg-alert/90 backdrop-blur-md text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.3),0_4px_12px_rgba(0,0,0,0.5)] border border-white/20 hover:bg-alert active:shadow-[inset_0_2px_4px_rgba(0,0,0,0.4)] active:brightness-95",
 };
 
 const sizes: Record<Size, string> = {

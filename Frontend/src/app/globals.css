@@ -16,16 +16,16 @@
  * See docs/branding-identity-v2.md for the full spec.
  * ------------------------------------------------------------------------- */
 :root {
-  --bg: #09090b; /* deep gunmetal */
-  --surface: #141417; /* machined surface */
-  --surface-sunk: #000000; /* deep inset */
+  --bg: #000000; /* pure black */
+  --surface: rgba(20, 20, 23, 0.4); /* glassy dark grey */
+  --surface-sunk: rgba(0, 0, 0, 0.6);
 
-  --ink: #f4f4f5; /* clean white */
-  --ink-muted: #a1a1aa; /* metallic grey */
-  --ink-subtle: #71717a; /* dim grey */
+  --ink: #ffffff; /* crisp white */
+  --ink-muted: #a1a1aa;
+  --ink-subtle: #52525b;
 
-  --border: #27272a; /* machined edge */
-  --border-strong: #3f3f46; /* highlighted edge */
+  --border: rgba(255, 255, 255, 0.05); /* snowy thin border */
+  --border-strong: rgba(255, 255, 255, 0.1);
 
   --accent: #d4af37; /* polished gold */
   --accent-hover: #e5c158; /* catching light */
@@ -40,9 +40,9 @@
   --negative-soft: #1f1808;
   --alert-soft: #1f0a10;
 
-  --shadow-sm: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.8);
-  --shadow-md: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.9);
-  --shadow-lg: inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 12px 32px -8px rgba(0, 0, 0, 0.95);
+  --shadow-sm: inset 0 1px 1px rgba(255, 255, 255, 0.03), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-lg: inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 16px 48px rgba(0, 0, 0, 0.8);
 
   /* Data-mark colors — coin gold for spending, neon green for earning.
      Validated for CVD separation and contrast against the dark surface. */
@@ -60,52 +60,7 @@
   --grain: 0.03; /* CRT noise */
 }
 
-/* ---------------------------------------------------------------------------
- * Dark theme — "lights off" arcade. Deeper blacks, slightly cooled gold.
- * Authored deliberately, not an inversion of the default.
- * ------------------------------------------------------------------------- */
-[data-theme="dark"] {
-  --bg: #050505;
-  --surface: #111111;
-  --surface-sunk: #080808;
 
-  --ink: #ede3cf; /* ~16:1 on bg */
-  --ink-muted: #9e9080; /*  ~7.5:1 on bg */
-  --ink-subtle: #6e6455; /*  ~5:1 on bg */
-
-  --border: #1f1b17;
-  --border-strong: #4a4030; /* ~3:1 on bg */
-
-  --accent: #c89b38; /* cooled coin gold */
-  --accent-hover: #d4a843;
-  --accent-soft: #1a1508;
-  --accent-on: #0a0a0a;
-
-  --positive: #30c965;
-  --negative: #cc9028;
-  --alert: #e83855;
-
-  --positive-soft: #0a1a0e;
-  --negative-soft: #1a1406;
-  --alert-soft: #1a080d;
-
-  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.5);
-  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.6);
-  --shadow-lg: 0 12px 32px -8px rgb(0 0 0 / 0.7);
-
-  /* Re-stepped for the deeper surface. */
-  --series-1: #c89b38;
-  --series-2: #30c965;
-  --chart-grid: #151310;
-  --chart-track: #181612;
-
-  /* Cabinet panel, not paper. */
-  --paper: #0e0c0a;
-  --paper-edge: #201c18;
-  --tape: #302820;
-  --thread: #4a4030;
-  --grain: 0.05;
-}
 
 /* Expose tokens to Tailwind as utilities: bg-surface, text-ink, border-border… */
 @theme inline {
@@ -161,9 +116,7 @@
 @layer base {
   html {
     color-scheme: dark;
-  }
-  [data-theme="dark"] {
-    color-scheme: dark;
+    background-color: var(--bg);
   }
 
   body {
